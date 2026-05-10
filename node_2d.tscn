@@ -1,9 +1,41 @@
 [gd_scene format=3 uid="uid://50esuti1sym0"]
 
-[node name="Node2D" type="Node2D" unique_id=359562186]
+[ext_resource type="Texture2D" uid="uid://boo8vn6yq5vui" path="res://img/vs_ai.png" id="1_0e48y"]
+[ext_resource type="Texture2D" uid="uid://dhk22idps0wrh" path="res://img/title.png" id="1_epypp"]
+[ext_resource type="Texture2D" uid="uid://fl2c65ilfnb0" path="res://img/vs_player.png" id="2_epypp"]
 
-[node name="Window" type="Window" parent="." unique_id=1116896580]
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_0e48y"]
+load_path = "res://.godot/imported/bg.png-9cce33047773a21d412d42f75802478a.ctex"
+
+[node name="Node2D" type="Node2D" unique_id=359562186]
+position = Vector2(552, 1340)
+
+[node name="main_menu" type="Window" parent="." unique_id=1116896580]
 oversampling_override = 1.0
 mode = 3
 position = Vector2i(0, 36)
 size = Vector2i(1080, 1920)
+
+[node name="Bg" type="Sprite2D" parent="main_menu" unique_id=326540077]
+position = Vector2(540.125, 941.24994)
+scale = Vector2(0.8690191, 1.5673842)
+texture = SubResource("CompressedTexture2D_0e48y")
+
+[node name="Title" type="Sprite2D" parent="main_menu" unique_id=1928370925]
+position = Vector2(530, 529)
+texture = ExtResource("1_epypp")
+
+[node name="TouchScreenButton" type="TouchScreenButton" parent="main_menu" unique_id=1570553958]
+position = Vector2(227.00003, 898)
+scale = Vector2(0.60599995, 0.6759994)
+texture_normal = ExtResource("2_epypp")
+
+[node name="TouchScreenButton2" type="TouchScreenButton" parent="main_menu" unique_id=1744578432]
+position = Vector2(252, 1084)
+scale = Vector2(0.5659999, 0.6679997)
+texture_normal = ExtResource("1_0e48y")
+
+[node name="main_game" type="Window" parent="." unique_id=503585345]
+oversampling_override = 1.0
+size = Vector2i(1080, 1920)
+visible = false
