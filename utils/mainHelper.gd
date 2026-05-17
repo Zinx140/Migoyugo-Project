@@ -40,7 +40,5 @@ static func makeMove(sourceBoard, row, col, currentPlayer):
 		"board" : newBoard,
 	}
 	
-	
-
 static func simulateMove(sourceBoard, row, col, player):
 	pass
