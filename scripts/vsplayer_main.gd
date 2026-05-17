@@ -2,23 +2,32 @@ class_name VSPlayerPanel
 extends GridContainer
 
 @onready var placingMigoSound = get_tree().current_scene.get_node("placingMigoEffect")
+@onready var invalidMigoSound = get_tree().current_scene.get_node("invalidMigoEffect")
 
 var board = MainHelper.create_empty_board();
 var currentPlayer = Constants.WHITE;
+var isOver = false;
 
 func _ready() -> void:
 	columns = Constants.BOARD_SIZE
 	init_board_buttons()
 
 func _on_cell_pressed(row, col):
+	if (isOver): return
+	
 	var result = MainHelper.makeMove(board, row, col, currentPlayer)
-	placingMigoSound.play()
-	await get_tree().create_timer(0.15).timeout
 	
 	if (result['isValid']):
+		placingMigoSound.play()
 		board = result['board']
 		render_board()
 		currentPlayer = getOpponent(currentPlayer)
+	else:
+		invalidMigoSound.play()
+		
+	if result['winner'] != "":
+		isOver = true;
+		print(result['winner'], ' Win!')
 	
 
 func resetBoard():

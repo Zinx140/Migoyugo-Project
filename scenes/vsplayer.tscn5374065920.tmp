@@ -6,9 +6,8 @@
 [ext_resource type="Script" uid="uid://v66y5o5qxycm" path="res://scripts/vsplayer_main.gd" id="4_yqjql"]
 [ext_resource type="Texture2D" uid="uid://d7tmsrpnwdk" path="res://assets/imgs/backBtn.png" id="5_j2tqc"]
 [ext_resource type="Texture2D" uid="uid://eu6xw8v62npg" path="res://assets/imgs/unmuteBtn.png" id="6_qxdqc"]
+[ext_resource type="AudioStream" uid="uid://b3qe65kbdrh1r" path="res://assets/sounds/btn_click.mp3" id="7_li34p"]
 [ext_resource type="AudioStream" uid="uid://cfdolokna2ite" path="res://assets/sounds/placing.wav" id="8_yqjql"]
-[ext_resource type="AudioStream" uid="uid://2fnffsqi5fk7" path="res://assets/sounds/invalid_migo.wav" id="9_1v85h"]
-[ext_resource type="AudioStream" uid="uid://8l10bnamox3e" path="res://assets/sounds/yugo.wav" id="9_j2tqc"]
 
 [node name="Vsplayer" type="Node2D" unique_id=1794983289]
 script = ExtResource("1_qxdqc")
@@ -74,13 +73,10 @@ grow_horizontal = 0
 scale = Vector2(0.4, 0.4)
 texture_normal = ExtResource("6_qxdqc")
 
+[node name="btnClickEffect" type="AudioStreamPlayer2D" parent="." unique_id=681690594]
+stream = ExtResource("7_li34p")
+
 [node name="placingMigoEffect" type="AudioStreamPlayer2D" parent="." unique_id=1074733842]
 stream = ExtResource("8_yqjql")
-
-[node name="yugoEffect" type="AudioStreamPlayer2D" parent="." unique_id=32059986]
-stream = ExtResource("9_j2tqc")
-
-[node name="invalidMigoEffect" type="AudioStreamPlayer2D" parent="." unique_id=543853271]
-stream = ExtResource("9_1v85h")
 
 [connection signal="button_down" from="VSPlayerNode/VSPlayerCanvasLayer/BackButton" to="." method="_on_back_button_button_down"]
