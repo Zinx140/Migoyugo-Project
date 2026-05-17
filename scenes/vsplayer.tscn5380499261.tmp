@@ -1,0 +1,82 @@
+[gd_scene format=3 uid="uid://b4glahe21k8dc"]
+
+[ext_resource type="Script" uid="uid://bimlmxoyxrkb1" path="res://scripts/vsplayer.gd" id="1_qxdqc"]
+[ext_resource type="Texture2D" uid="uid://b5ryy1l5brn5k" path="res://assets/imgs/main_bg.png" id="2_qxdqc"]
+[ext_resource type="Texture2D" uid="uid://dipa7bklb4rit" path="res://assets/imgs/title.png" id="3_li34p"]
+[ext_resource type="Script" uid="uid://v66y5o5qxycm" path="res://scripts/vsplayer_main.gd" id="4_yqjql"]
+[ext_resource type="Texture2D" uid="uid://d7tmsrpnwdk" path="res://assets/imgs/backBtn.png" id="5_j2tqc"]
+[ext_resource type="Texture2D" uid="uid://eu6xw8v62npg" path="res://assets/imgs/unmuteBtn.png" id="6_qxdqc"]
+[ext_resource type="AudioStream" uid="uid://b3qe65kbdrh1r" path="res://assets/sounds/btn_click.mp3" id="7_li34p"]
+[ext_resource type="AudioStream" uid="uid://cfdolokna2ite" path="res://assets/sounds/placing.wav" id="8_yqjql"]
+
+[node name="Vsplayer" type="Node2D" unique_id=1794983289]
+script = ExtResource("1_qxdqc")
+
+[node name="VSPlayerNode" type="Node2D" parent="." unique_id=215379492]
+
+[node name="VSPlayerBackground" type="ParallaxBackground" parent="VSPlayerNode" unique_id=1702499786]
+
+[node name="VSPlayer_bg" type="TextureRect" parent="VSPlayerNode/VSPlayerBackground" unique_id=1623137731]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_qxdqc")
+
+[node name="VSPlayerCanvasLayer" type="CanvasLayer" parent="VSPlayerNode" unique_id=1256306319]
+
+[node name="Title" type="TextureRect" parent="VSPlayerNode/VSPlayerCanvasLayer" unique_id=523002985]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -305.0
+offset_top = 170.0
+offset_right = 558.0
+offset_bottom = 459.0
+grow_horizontal = 2
+scale = Vector2(0.7, 0.7)
+size_flags_horizontal = 4
+size_flags_vertical = 0
+texture = ExtResource("3_li34p")
+
+[node name="BoardContainer" type="CenterContainer" parent="VSPlayerNode/VSPlayerCanvasLayer" unique_id=1984055656]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="BoardGridContainer" type="GridContainer" parent="VSPlayerNode/VSPlayerCanvasLayer/BoardContainer" unique_id=1911133968]
+layout_mode = 2
+script = ExtResource("4_yqjql")
+
+[node name="BackButton" type="TextureButton" parent="VSPlayerNode/VSPlayerCanvasLayer" unique_id=498739760]
+offset_left = 50.0
+offset_top = 450.0
+offset_right = 550.0
+offset_bottom = 950.0
+scale = Vector2(0.4, 0.4)
+texture_normal = ExtResource("5_j2tqc")
+
+[node name="SoundBtn" type="TextureButton" parent="VSPlayerNode/VSPlayerCanvasLayer" unique_id=513631115]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -230.0
+offset_top = 450.0
+offset_right = 270.0
+offset_bottom = 950.0
+grow_horizontal = 0
+scale = Vector2(0.4, 0.4)
+texture_normal = ExtResource("6_qxdqc")
+
+[node name="btnClickEffect" type="AudioStreamPlayer2D" parent="." unique_id=681690594]
+stream = ExtResource("7_li34p")
+
+[node name="placingMigoEffect" type="AudioStreamPlayer2D" parent="." unique_id=1074733842]
+stream = ExtResource("8_yqjql")
+
+[connection signal="button_down" from="VSPlayerNode/VSPlayerCanvasLayer/BackButton" to="." method="_on_back_button_button_down"]
