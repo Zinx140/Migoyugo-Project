@@ -17,16 +17,20 @@ boot_splash/bg_color=Color(0, 0, 0, 1)
 boot_splash/stretch_mode=4
 config/icon="res://icon.svg"
 
+[autoload]
+
+AudioManager="*uid://btsmgt0ddefh"
+
 [display]
 
 window/size/viewport_width=1080
-window/size/viewport_height=1920
-window/size/window_width_override=457
-window/size/window_height_override=814
+window/size/viewport_height=2400
+window/size/window_width_override=360
+window/size/window_height_override=800
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 window/handheld/orientation=1
-window/name="Ai_Project"
+window/name="Migoyugo"
 
 [physics]
 

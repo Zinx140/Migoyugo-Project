@@ -1,0 +1,76 @@
+[gd_scene format=3 uid="uid://50esuti1sym0"]
+
+[ext_resource type="Script" uid="uid://624c4i6hara2" path="res://scripts/menu.gd" id="1_4ytvr"]
+[ext_resource type="Texture2D" uid="uid://dipa7bklb4rit" path="res://assets/imgs/title.png" id="2_g3eks"]
+[ext_resource type="Texture2D" uid="uid://b2ekh0rxw1u3n" path="res://assets/imgs/btnVSAI.png" id="3_v86rl"]
+[ext_resource type="Texture2D" uid="uid://cvpsgrknubmx1" path="res://assets/imgs/btnVSPlayer.png" id="4_13sgg"]
+[ext_resource type="Texture2D" uid="uid://cnbj5oyeedh7q" path="res://assets/imgs/bg.png" id="5_i6lef"]
+[ext_resource type="AudioStream" uid="uid://b3qe65kbdrh1r" path="res://assets/sounds/btn_click.mp3" id="6_g3eks"]
+
+[node name="MainScreen" type="Node2D" unique_id=1958071876]
+script = ExtResource("1_4ytvr")
+
+[node name="MenuNode" type="Node2D" parent="." unique_id=1853114027]
+
+[node name="MenuCanvasLayer" type="CanvasLayer" parent="MenuNode" unique_id=1846526809]
+follow_viewport_enabled = true
+
+[node name="Title" type="TextureRect" parent="MenuNode/MenuCanvasLayer" unique_id=958922717]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -435.0
+offset_top = 300.0
+offset_right = 428.0
+offset_bottom = 589.0
+grow_horizontal = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+texture = ExtResource("2_g3eks")
+
+[node name="VSAIButton" type="TextureButton" parent="MenuNode/MenuCanvasLayer" unique_id=330213836]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -300.0
+offset_top = -1300.0
+offset_right = 220.0
+offset_bottom = -1059.0
+grow_horizontal = 2
+grow_vertical = 0
+scale = Vector2(1.2, 1.2)
+texture_normal = ExtResource("3_v86rl")
+
+[node name="VSPlayerButton" type="TextureButton" parent="MenuNode/MenuCanvasLayer" unique_id=13942091]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -300.0
+offset_top = -1600.0
+offset_right = 207.0
+offset_bottom = -1389.0
+grow_horizontal = 2
+grow_vertical = 0
+scale = Vector2(1.2, 1.2)
+texture_normal = ExtResource("4_13sgg")
+
+[node name="MenuBackground" type="ParallaxBackground" parent="MenuNode" unique_id=1561692619]
+layer = 0
+follow_viewport_enabled = true
+
+[node name="menu_bg" type="TextureRect" parent="MenuNode/MenuBackground" unique_id=439040362]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("5_i6lef")
+
+[node name="btnClickEffect" type="AudioStreamPlayer2D" parent="." unique_id=1166580827]
+stream = ExtResource("6_g3eks")
+
+[connection signal="button_down" from="MenuNode/MenuCanvasLayer/VSPlayerButton" to="." method="_on_vs_player_button_down"]
