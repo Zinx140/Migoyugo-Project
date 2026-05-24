@@ -6,6 +6,8 @@
 [ext_resource type="Script" uid="uid://v66y5o5qxycm" path="res://scripts/vsplayer_main.gd" id="4_yqjql"]
 [ext_resource type="Texture2D" uid="uid://d7tmsrpnwdk" path="res://assets/imgs/backBtn.png" id="5_j2tqc"]
 [ext_resource type="Texture2D" uid="uid://eu6xw8v62npg" path="res://assets/imgs/unmuteBtn.png" id="6_qxdqc"]
+[ext_resource type="Texture2D" uid="uid://cfp0ewse7fobw" path="res://assets/imgs/white_turn.png" id="7_1v85h"]
+[ext_resource type="Texture2D" uid="uid://dmljinxfl11xq" path="res://assets/imgs/black_turn.png" id="7_k630s"]
 [ext_resource type="AudioStream" uid="uid://cfdolokna2ite" path="res://assets/sounds/placing.wav" id="8_yqjql"]
 [ext_resource type="AudioStream" uid="uid://2fnffsqi5fk7" path="res://assets/sounds/invalid_migo.wav" id="9_1v85h"]
 [ext_resource type="AudioStream" uid="uid://8l10bnamox3e" path="res://assets/sounds/yugo.wav" id="9_j2tqc"]
@@ -73,6 +75,30 @@ offset_bottom = 950.0
 grow_horizontal = 0
 scale = Vector2(0.4, 0.4)
 texture_normal = ExtResource("6_qxdqc")
+
+[node name="BlackTurn" type="TextureRect" parent="VSPlayerNode/VSPlayerCanvasLayer" unique_id=1391426174]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -275.0
+offset_top = 490.0
+offset_right = 842.0
+offset_bottom = 713.0
+grow_horizontal = 2
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("7_k630s")
+
+[node name="WhiteTurn" type="TextureRect" parent="VSPlayerNode/VSPlayerCanvasLayer" unique_id=944066596]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -274.0
+offset_top = 492.0
+offset_right = 843.0
+offset_bottom = 715.0
+grow_horizontal = 2
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("7_1v85h")
 
 [node name="placingMigoEffect" type="AudioStreamPlayer2D" parent="." unique_id=1074733842]
 stream = ExtResource("8_yqjql")

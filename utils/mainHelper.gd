@@ -144,6 +144,10 @@ static func isIgo(sourceBoard, row, col, player) -> bool:
 		count += countSpecialTokenInDirection(sourceBoard, row, col, direction.dr, direction.dc, player)
 
 	return count == 4
+	
+static func getIgoBoard():
+	
+	pass
 
 static func simulateMove(sourceBoard, row, col, player) -> Dictionary:
 	if not isInsideBoard(row, col):
