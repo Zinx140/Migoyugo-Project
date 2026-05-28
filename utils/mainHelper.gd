@@ -204,6 +204,15 @@ static func isBoardFull(sourceBoard) -> bool:
 				return false
 	return true
 
+static func getTokenScore(token: String) -> float:
+	if token.begins_with("S"): 
+		return 60.0
+	if token.begins_with("T"): 
+		return 40.0
+	if token.begins_with("X"): 
+		return 25.0
+	return 10.0
+
 static func getWegoResult(sourceBoard) -> Dictionary:
 	var white = Constants.WHITE
 	var black = Constants.BLACK
