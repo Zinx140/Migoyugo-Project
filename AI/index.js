@@ -355,6 +355,9 @@ function simulateMove(sourceBoard, row, col, player) {
 
   const hasIgo = isIgo(newBoard, row, col, player);
 
+  if hasIgo:
+		print("Igo detected! Player ", player, " wins!")
+
   return {
     isValid: true,
     board: newBoard,

@@ -173,7 +173,7 @@ static func simulateMove(sourceBoard, row, col, player) -> Dictionary:
 
 	resolveYugo(newBoard, row, col, player)
 	var hasIgo = isIgo(newBoard, row, col, player)
-
+	
 	return {
 		"isValid": true,
 		"message": "Success",
