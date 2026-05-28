@@ -2,23 +2,43 @@ class_name VSPlayerPanel
 extends GridContainer
 
 @onready var placingMigoSound = get_tree().current_scene.get_node("placingMigoEffect")
+@onready var invalidMigoSound = get_tree().current_scene.get_node("invalidMigoEffect")
+@onready var blackTurnComp = get_tree().current_scene.get_node("VSPlayerNode/VSPlayerCanvasLayer/BlackTurn")
+@onready var whiteTurnComp = get_tree().current_scene.get_node("VSPlayerNode/VSPlayerCanvasLayer/WhiteTurn")
 
 var board = MainHelper.create_empty_board();
 var currentPlayer = Constants.WHITE;
+var isOver = false;
 
 func _ready() -> void:
 	columns = Constants.BOARD_SIZE
 	init_board_buttons()
 
+func renderTurnComp():
+	if currentPlayer == Constants.WHITE:
+		whiteTurnComp.visible = true
+		blackTurnComp.visible = false		
+	else:
+		whiteTurnComp.visible = false
+		blackTurnComp.visible = true
+
 func _on_cell_pressed(row, col):
+	if (isOver): return
+	
 	var result = MainHelper.makeMove(board, row, col, currentPlayer)
-	placingMigoSound.play()
-	await get_tree().create_timer(0.15).timeout
 	
 	if (result['isValid']):
+		placingMigoSound.play()
 		board = result['board']
 		render_board()
 		currentPlayer = getOpponent(currentPlayer)
+		renderTurnComp()
+	else:
+		invalidMigoSound.play()
+		
+	if result['winner'] != "":
+		isOver = true;
+		print(result['winner'], ' Win!')
 	
 
 func resetBoard():
@@ -60,3 +80,29 @@ func render_board():
 
 			# reset texture dulu
 			btn.texture_normal = load(CompHelper.getTilesPath(cell))
+		
+func mark_cell(row: int, col: int) -> void:
+	var index = row * Constants.BOARD_SIZE + col
+	var btn = get_child(index) as TextureButton
+	
+	if not btn: return
+
+	# Cek apakah button ini sudah punya border panel sebelumnya agar tidak double
+	var existing_border = btn.get_node_or_null("IgoBorder")
+	if existing_border:
+		return # Sudah ditandai, tidak perlu ditambah lagi
+
+	# Membuat Panel baru sebagai border merah tebal
+	var border_panel = Panel.new()
+	border_panel.name = "IgoBorder" # Diberi nama unik agar mudah dicari/dihapus
+	border_panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	border_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	# Setup StyleBoxFlat untuk border merah tebal
+	var style_box = StyleBoxFlat.new()
+	style_box.bg_color = Color(0, 0, 0, 0) # Tengahnya transparan
+	style_box.border_color = Color.RED     # Warna border merah
+	style_box.set_border_width_all(6)      # Ketebalan border 6 pixel
+
+	border_panel.add_theme_stylebox_override("panel", style_box)
+	btn.add_child(border_panel)

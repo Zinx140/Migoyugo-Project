@@ -107,6 +107,8 @@ static func resolveYugo(sourceBoard, row, col, player) -> int:
 
 	for cell in cellsToClear.values():
 		sourceBoard[cell.row][cell.col] = Constants.EMPTY
+	
+	AudioManager.play_yugo()
 
 	if matchedAxes.size() > 3:
 		sourceBoard[row][col] = "S" + str(player)
@@ -142,6 +144,10 @@ static func isIgo(sourceBoard, row, col, player) -> bool:
 		count += countSpecialTokenInDirection(sourceBoard, row, col, direction.dr, direction.dc, player)
 
 	return count == 4
+	
+static func getIgoBoard():
+	
+	pass
 
 static func simulateMove(sourceBoard, row, col, player) -> Dictionary:
 	if not isInsideBoard(row, col):

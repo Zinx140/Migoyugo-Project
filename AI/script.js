@@ -4,7 +4,7 @@ const BLACK = "B";
 const EMPTY = "";
 
 const MAX_DEPTH = 3;
-const TOP_K = 5;
+const TOP_K = 3;
 
 const AI_ENABLED = true;
 const HUMAN_PLAYER = WHITE;
