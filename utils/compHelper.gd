@@ -7,6 +7,10 @@ static func getTilesPath(cell):
 			return Constants.BLACK_MIGO
 		Constants.WHITE:
 			return Constants.WHITE_MIGO
+		Constants.OBLACK:
+			return Constants.OBLACK_YUGO
+		Constants.OWHITE:
+			return Constants.OWHITE_YUGO
 		Constants.XBLACK:
 			return Constants.BLACK_YUGO
 		Constants.XWHITE:

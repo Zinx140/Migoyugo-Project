@@ -9,8 +9,10 @@ static func get_cell_id(row, col):
 
 static func getWegoTokenScore(token: String) -> int:
 	if token.begins_with("S"):
-		return 3
+		return 4
 	if token.begins_with("T"):
+		return 3
+	if token.begins_with("O"):
 		return 2
 	if token.begins_with("X"):
 		return 1
@@ -112,15 +114,17 @@ static func resolveYugo(sourceBoard, row, col, player) -> int:
 
 	if matchedAxes.size() > 3:
 		sourceBoard[row][col] = "S" + str(player)
-	elif matchedAxes.size() > 1:
+	elif matchedAxes.size() > 2:
 		sourceBoard[row][col] = "T" + str(player)
+	elif matchedAxes.size() > 1:
+		sourceBoard[row][col] = "O" + str(player)
 	else:
 		sourceBoard[row][col] = "X" + str(player)
 
 	return matchedAxes.size()
 
 static func isSpecialToken(token, player) -> bool:
-	return token == "X" + str(player) or token == "T" + str(player) or token == "S" + str(player)
+	return token == "X" + str(player) or token == "O" + str(player) or token == "T" + str(player) or token == "S" + str(player)
 
 static func countSpecialTokenInDirection(sourceBoard, row, col, dr: int, dc: int, player) -> int:
 	var count = 0
@@ -206,8 +210,10 @@ static func isBoardFull(sourceBoard) -> bool:
 
 static func getTokenScore(token: String) -> float:
 	if token.begins_with("S"): 
-		return 60.0
+		return 80.0
 	if token.begins_with("T"): 
+		return 60.0
+	if token.begins_with("O"): 
 		return 40.0
 	if token.begins_with("X"): 
 		return 25.0
@@ -247,6 +253,21 @@ static func getWegoResult(sourceBoard) -> Dictionary:
 		"scores": scores
 	}
 
+static func hasValidMove(board, player) -> bool:
+	for row in range(Constants.BOARD_SIZE):
+		for col in range(Constants.BOARD_SIZE):
+
+			if board[row][col] != Constants.EMPTY:
+				continue
+
+			var testBoard = cloneBoard(board)
+			testBoard[row][col] = player
+
+			if canPlaceMigo(testBoard, row, col, player):
+				return true
+
+	return false
+
 static func makeMove(board, row, col, player) -> Dictionary:
 	var result = MainHelper.simulateMove(board, row, col, player)
 
@@ -280,6 +301,42 @@ static func makeMove(board, row, col, player) -> Dictionary:
 		return result
 
 	var next_player = getOpponent(player)
+	var can_move = hasValidMove(next_board, next_player)
+	
+	if not can_move:
+		var wegoResult = getWegoResult(next_board)
+
+		var whiteScore = wegoResult.scores[Constants.WHITE]
+		var blackScore = wegoResult.scores[Constants.BLACK]
+
+		if wegoResult.winner != "":
+			winner = wegoResult.winner
+
+			updateInfo(
+				player,
+				"No valid move. Wego! " +
+				str(winner) +
+				" win! W: " +
+				str(whiteScore) +
+				", B: " +
+				str(blackScore)
+			)
+
+			result["winner"] = winner
+		else:
+			updateInfo(
+				player,
+				"No valid move. Wego draw! W: " +
+				str(whiteScore) +
+				", B: " +
+				str(blackScore)
+			)
+
+			result["winner"] = "DRAW"
+
+		result["next_player"] = ""
+		return result
+	
 	updateInfo(next_player)
 	
 	result["next_player"] = next_player

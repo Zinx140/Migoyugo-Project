@@ -81,53 +81,6 @@ func create_trace_node(params: Dictionary) -> Dictionary:
 		"children": []
 	}
 
-func clone_trace_for_drawing(node: Dictionary, level: int) -> Dictionary:
-	var children = []
-	
-	if level < Constants.TRACE_MAX_PRINT_DEPTH + 1:
-		var sliced_children = node.children.slice(0, Constants.TRACE_MAX_CHILDREN_PER_NODE)
-		for child in sliced_children:
-			children.append(clone_trace_for_drawing(child, level + 1))
-			
-	var cloned_node = node.duplicate()
-	
-	cloned_node.children = children
-	cloned_node.drawX = 0.0
-	cloned_node.drawY = 0.0
-	cloned_node.subtreeWidth = 0.0
-	
-	return cloned_node
-
-
-func calculate_trace_tree_width(node: Dictionary) -> float:
-	if node.children.size() == 0:
-		node.subtreeWidth = Constants.TRACE_NODE_WIDTH + Constants.TRACE_HORIZONTAL_GAP
-		return node.subtreeWidth
-
-	var total_children_width = 0.0
-	for child in node.children:
-		total_children_width += calculate_trace_tree_width(child)
-
-	node.subtreeWidth = max(
-		Constants.TRACE_NODE_WIDTH + Constants.TRACE_HORIZONTAL_GAP,
-		total_children_width
-	)
-
-	return node.subtreeWidth
-
-
-func calculate_trace_tree_height(node: Dictionary) -> float:
-	if node.children.size() == 0:
-		return Constants.TRACE_NODE_HEIGHT
-
-	var max_child_height = 0.0
-	for child in node.children:
-		var child_height = calculate_trace_tree_height(child)
-		if child_height > max_child_height:
-			max_child_height = child_height
-
-	return Constants.TRACE_NODE_HEIGHT + Constants.TRACE_VERTICAL_GAP + max_child_height
-
 
 
 func init_minimax_canvas() -> void:
@@ -151,34 +104,7 @@ func init_minimax_canvas() -> void:
 	
 	print("Canvas Minimax berhasil diinisialisasi menggunakan hierarki Node Godot!")
 
-func draw_minimax_trace_tree(root) -> void:
-	if not Constants.TRACE_CANVAS_ENABLED:
-		return
 
-	if not TRACE_CANVAS or not TRACE_CTX:
-		init_minimax_canvas()
-
-	if not TRACE_CANVAS or not TRACE_CTX:
-		return
-
-	var drawable_root = clone_trace_for_drawing(root, 0)
-	var tree_width = calculate_trace_tree_width(drawable_root)
-	var tree_height = calculate_trace_tree_height(drawable_root)
-
-	TRACE_CANVAS.width = max(1200.0, tree_width + 120.0)
-	TRACE_CANVAS.height = max(700.0, tree_height + 120.0)
-
-	TRACE_CTX.clear_rect(0, 0, TRACE_CANVAS.width, TRACE_CANVAS.height)
-	TRACE_CTX.font = "12px Arial"
-	TRACE_CTX.text_align = "center"
-	TRACE_CTX.text_baseline = "middle"
-
-	var start_x = TRACE_CANVAS.width / 2.0
-	var start_y = 50.0
-
-	#assign_trace_node_positions(drawable_root, start_x, start_y)
-	#draw_trace_connections(drawable_root)
-	#draw_trace_nodes(drawable_root)
 
 func print_trace_branch(node: Dictionary, prefix: String, is_last: bool, level: int) -> void:
 	if level > Constants.TRACE_MAX_PRINT_DEPTH + 1:
@@ -199,7 +125,7 @@ func print_minimax_trace(root: Dictionary) -> void:
 	if not Constants.TRACE_MINIMAX:
 		return
 
-	draw_minimax_trace_tree(root)
+	#draw_minimax_trace_tree(root)
 
 	# console.clear() tidak ada padanannya di konsol standar Godot.
 	# Jika ingin membersihkan layar secara visual di output debug, kamu bisa mencetak baris kosong:
@@ -221,7 +147,7 @@ func print_minimax_trace(root: Dictionary) -> void:
 		var is_last = (index == children.size() - 1)
 		print_trace_branch(child, "", is_last, 1)
 
-	draw_minimax_trace_tree(root)
+	#draw_minimax_trace_tree(root)
 
 
 func make_ai_move(board) -> void:

@@ -69,4 +69,5 @@ grow_horizontal = 2
 grow_vertical = 2
 texture = ExtResource("5_i6lef")
 
+[connection signal="button_down" from="MenuNode/MenuCanvasLayer/VSAIButton" to="." method="_on_vsai_button_button_down"]
 [connection signal="button_down" from="MenuNode/MenuCanvasLayer/VSPlayerButton" to="." method="_on_vs_player_button_down"]
