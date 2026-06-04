@@ -3,10 +3,10 @@
 [ext_resource type="Script" uid="uid://bimlmxoyxrkb1" path="res://scripts/vsplayer.gd" id="1_qxdqc"]
 [ext_resource type="Texture2D" uid="uid://b5ryy1l5brn5k" path="res://assets/imgs/main_bg.png" id="2_qxdqc"]
 [ext_resource type="Texture2D" uid="uid://dipa7bklb4rit" path="res://assets/imgs/title.png" id="3_li34p"]
-[ext_resource type="Texture2D" uid="uid://b26w8jdro7oef" path="res://assets/imgs/b_win.png" id="4_k630s"]
+[ext_resource type="Texture2D" uid="uid://dy63a2hf8qeb1" path="res://assets/imgs/black_win.png" id="4_nave4"]
 [ext_resource type="Script" uid="uid://v66y5o5qxycm" path="res://scripts/vsplayer_main.gd" id="4_yqjql"]
 [ext_resource type="Texture2D" uid="uid://d7tmsrpnwdk" path="res://assets/imgs/backBtn.png" id="5_j2tqc"]
-[ext_resource type="Texture2D" uid="uid://dcylw12wsfh7o" path="res://assets/imgs/w_win.png" id="5_nave4"]
+[ext_resource type="Texture2D" uid="uid://ct2akg4aes2k0" path="res://assets/imgs/white_win.png" id="5_p6w2a"]
 [ext_resource type="Texture2D" uid="uid://df2tx3lao1aku" path="res://assets/imgs/play_again.png" id="6_p6w2a"]
 [ext_resource type="Texture2D" uid="uid://cfp0ewse7fobw" path="res://assets/imgs/white_turn.png" id="7_1v85h"]
 [ext_resource type="Texture2D" uid="uid://5xkude6jvj1s" path="res://assets/imgs/exit.png" id="7_ij8mu"]
@@ -48,38 +48,38 @@ texture = ExtResource("3_li34p")
 
 [node name="BWin" type="TextureRect" parent="VSPlayerNode/VSPlayerCanvasLayer" unique_id=2018589792]
 visible = false
-offset_left = 45.000004
-offset_top = 489.00006
-offset_right = 453.0
-offset_bottom = 1101.0
-scale = Vector2(2.45, 2.45)
-texture = ExtResource("4_k630s")
+offset_left = 43.999878
+offset_top = 447.0
+offset_right = 1160.9999
+offset_bottom = 670.0
+scale = Vector2(0.9, 0.9)
+texture = ExtResource("4_nave4")
 
 [node name="WWin" type="TextureRect" parent="VSPlayerNode/VSPlayerCanvasLayer" unique_id=129599735]
 visible = false
-offset_left = 30.0
-offset_top = 494.0001
-offset_right = 438.0
-offset_bottom = 1106.0001
-scale = Vector2(2.5, 2.5)
-texture = ExtResource("5_nave4")
+offset_left = 36.0
+offset_top = 444.0001
+offset_right = 1153.0
+offset_bottom = 667.0001
+scale = Vector2(0.9, 0.9)
+texture = ExtResource("5_p6w2a")
 
 [node name="PlayAgainBtn" type="TextureButton" parent="VSPlayerNode/VSPlayerCanvasLayer" unique_id=866358084]
 visible = false
-offset_left = 145.0
-offset_top = 1374.0
+offset_left = 145.00002
+offset_top = 1731.0001
 offset_right = 1145.0
-offset_bottom = 1624.0
+offset_bottom = 1981.0001
 scale = Vector2(0.8, 0.8)
 texture_normal = ExtResource("6_p6w2a")
 
 [node name="ExitBtn" type="TextureButton" parent="VSPlayerNode/VSPlayerCanvasLayer" unique_id=2140163601]
 visible = false
-offset_left = 168.0
-offset_top = 1624.0002
-offset_right = 1168.0
-offset_bottom = 1874.0002
-scale = Vector2(0.75, 0.75)
+offset_left = 197.00002
+offset_top = 1955.0005
+offset_right = 1197.0
+offset_bottom = 2205.0005
+scale = Vector2(0.7, 0.7)
 texture_normal = ExtResource("7_ij8mu")
 
 [node name="BoardContainer" type="CenterContainer" parent="VSPlayerNode/VSPlayerCanvasLayer" unique_id=1984055656]

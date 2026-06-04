@@ -1,10 +1,10 @@
-[gd_scene format=3 uid="uid://bdo6248ep8krf"]
+[gd_scene format=3 uid="uid://h80037g55r6"]
 
 [ext_resource type="Script" uid="uid://brbgi3ssq0oed" path="res://scripts/vsAi.gd" id="1_57axd"]
 [ext_resource type="Texture2D" uid="uid://b5ryy1l5brn5k" path="res://assets/imgs/main_bg.png" id="2_ljmqr"]
 [ext_resource type="Texture2D" uid="uid://dipa7bklb4rit" path="res://assets/imgs/title.png" id="3_pj1jr"]
-[ext_resource type="Texture2D" uid="uid://b26w8jdro7oef" path="res://assets/imgs/b_win.png" id="4_6rohl"]
-[ext_resource type="Texture2D" uid="uid://dcylw12wsfh7o" path="res://assets/imgs/w_win.png" id="5_0gw23"]
+[ext_resource type="Texture2D" uid="uid://dy63a2hf8qeb1" path="res://assets/imgs/black_win.png" id="4_57axd"]
+[ext_resource type="Texture2D" uid="uid://ct2akg4aes2k0" path="res://assets/imgs/white_win.png" id="5_ljmqr"]
 [ext_resource type="Texture2D" uid="uid://df2tx3lao1aku" path="res://assets/imgs/play_again.png" id="6_s7b25"]
 [ext_resource type="Script" uid="uid://gu7mmb102me1" path="res://scripts/vsAi_main.gd" id="7_0cqtl"]
 [ext_resource type="Texture2D" uid="uid://5xkude6jvj1s" path="res://assets/imgs/exit.png" id="7_2hky4"]
@@ -46,40 +46,40 @@ size_flags_horizontal = 4
 size_flags_vertical = 0
 texture = ExtResource("3_pj1jr")
 
-[node name="BWin" type="TextureRect" parent="VSPlayerNode/VSPlayerCanvasLayer" unique_id=334636521]
+[node name="BWin" type="TextureRect" parent="VSPlayerNode/VSPlayerCanvasLayer" unique_id=1826449635]
 visible = false
-offset_left = 45.000004
-offset_top = 489.00006
-offset_right = 453.0
-offset_bottom = 1101.0
-scale = Vector2(2.45, 2.45)
-texture = ExtResource("4_6rohl")
+offset_left = 36.8
+offset_top = 444.0
+offset_right = 1153.8
+offset_bottom = 667.0
+scale = Vector2(0.9, 0.9)
+texture = ExtResource("4_57axd")
 
-[node name="WWin" type="TextureRect" parent="VSPlayerNode/VSPlayerCanvasLayer" unique_id=577173102]
+[node name="WWin" type="TextureRect" parent="VSPlayerNode/VSPlayerCanvasLayer" unique_id=288371505]
 visible = false
-offset_left = 30.0
-offset_top = 494.0001
-offset_right = 438.0
-offset_bottom = 1106.0001
-scale = Vector2(2.5, 2.5)
-texture = ExtResource("5_0gw23")
+offset_left = 36.0
+offset_top = 444.0
+offset_right = 1153.0
+offset_bottom = 667.0
+scale = Vector2(0.9, 0.9)
+texture = ExtResource("5_ljmqr")
 
-[node name="PlayAgainBtn" type="TextureButton" parent="VSPlayerNode/VSPlayerCanvasLayer" unique_id=750313899]
+[node name="PlayAgainBtn" type="TextureButton" parent="VSPlayerNode/VSPlayerCanvasLayer" unique_id=1268394641]
 visible = false
 offset_left = 145.0
-offset_top = 1374.0
+offset_top = 1731.0
 offset_right = 1145.0
-offset_bottom = 1624.0
+offset_bottom = 1981.0
 scale = Vector2(0.8, 0.8)
 texture_normal = ExtResource("6_s7b25")
 
-[node name="ExitBtn" type="TextureButton" parent="VSPlayerNode/VSPlayerCanvasLayer" unique_id=1719198184]
+[node name="ExitBtn" type="TextureButton" parent="VSPlayerNode/VSPlayerCanvasLayer" unique_id=704547208]
 visible = false
-offset_left = 168.0
-offset_top = 1624.0002
-offset_right = 1168.0
-offset_bottom = 1874.0002
-scale = Vector2(0.75, 0.75)
+offset_left = 197.0
+offset_top = 1955.0
+offset_right = 1197.0
+offset_bottom = 2205.0
+scale = Vector2(0.7, 0.7)
 texture_normal = ExtResource("7_2hky4")
 
 [node name="BoardContainer" type="CenterContainer" parent="VSPlayerNode/VSPlayerCanvasLayer" unique_id=841303779]

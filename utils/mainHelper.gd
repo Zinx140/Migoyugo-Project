@@ -140,14 +140,39 @@ static func countSpecialTokenInDirection(sourceBoard, row, col, dr: int, dc: int
 
 static func isIgo(sourceBoard, row, col, player) -> bool:
 	var selectedToken = sourceBoard[row][col]
+
 	if not isSpecialToken(selectedToken, player):
 		return false
 
-	for direction in Constants.DIRECTIONS:
+	var directionPairs = [
+		[[1, 0], [-1, 0]],    # bawah + atas
+		[[0, 1], [0, -1]],    # kanan + kiri
+		[[1, 1], [-1, -1]],   # kanan bawah + kiri atas
+		[[1, -1], [-1, 1]]    # kiri bawah + kanan atas
+	]
+
+	for pair in directionPairs:
 		var count = 1
-		count += countSpecialTokenInDirection(sourceBoard, row, col, direction.dr, direction.dc, player)
-		print(count)
-		if (count >= 4):
+
+		count += countSpecialTokenInDirection(
+			sourceBoard,
+			row,
+			col,
+			pair[0][0],
+			pair[0][1],
+			player
+		)
+
+		count += countSpecialTokenInDirection(
+			sourceBoard,
+			row,
+			col,
+			pair[1][0],
+			pair[1][1],
+			player
+		)
+
+		if count >= 4:
 			return true
 
 	return false

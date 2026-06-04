@@ -11,6 +11,7 @@ extends GridContainer
 @onready var exitBtn = get_tree().current_scene.get_node("VSPlayerNode/VSPlayerCanvasLayer/ExitBtn")
 @onready var backBtn = get_tree().current_scene.get_node("VSPlayerNode/VSPlayerCanvasLayer/BackButton")
 @onready var boardContainer = get_tree().current_scene.get_node("VSPlayerNode/VSPlayerCanvasLayer/BoardContainer")
+@onready var boardGridContainer = get_tree().current_scene.get_node("VSPlayerNode/VSPlayerCanvasLayer/BoardContainer/BoardGridContainer")
 @onready var ai_helper = preload("res://utils/aiHelper.gd").new()
 
 var board = MainHelper.create_empty_board();
@@ -88,7 +89,8 @@ func showWinMenu(winner):
 		blackWin.visible = true
 	
 	backBtn.visible= false
-	boardContainer.visible= false
+	boardContainer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	boardGridContainer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	whiteTurnComp.visible= false
 	blackTurnComp.visible= false
 	playAgainBtn.visible = true
