@@ -12,14 +12,17 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	pass
 
-func _on_vs_player_button_down() -> void:
+func _on_vs_player_button_button_down() -> void:
 	AudioManager.play_click()
 	get_tree().change_scene_to_file(
 		"res://scenes/vsplayer.tscn"
 	)
 	pass # Replace with function body.
 
+
 func _on_vsai_button_button_down() -> void:
 	AudioManager.play_click()
-	get_tree().change_scene_to_file("res://scenes/vsai.tscn")
-	pass
+	get_tree().change_scene_to_file(
+		"res://scenes/vsAi.tscn"
+	)
+	pass # Replace with function body.

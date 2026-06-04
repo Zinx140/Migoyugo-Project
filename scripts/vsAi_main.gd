@@ -18,10 +18,14 @@ var board = MainHelper.create_empty_board();
 var currentPlayer = Constants.WHITE;
 var isOver = false;
 var AI_PLAYER = Constants.BLACK
+var HUMAN_PLAYER = Constants.WHITE
 
 func _ready() -> void:
 	columns = Constants.BOARD_SIZE
 	init_board_buttons()
+	renderTurnComp()
+	if (currentPlayer == AI_PLAYER):
+		ai_turn()
 
 func renderTurnComp():
 	if currentPlayer == Constants.WHITE:
@@ -45,24 +49,24 @@ func _on_cell_pressed(row, col):
 		currentPlayer = getOpponent(currentPlayer)
 		renderTurnComp()
 		
+		if result['winner'] != "":
+			isOver = true;
+			print(result['winner'], ' Win!')
+			showWinMenu(result['winner'])
+		
 		# 🤖 AI jalan setelah player
 		if not isOver:
 			await get_tree().create_timer(0.3).timeout
 			ai_turn()
 	else:
 		invalidMigoSound.play()
-		
-	if result['winner'] != "":
-		isOver = true;
-		print(result['winner'], ' Win!')
-		showWinMenu(result['winner'])
 
 # 🤖 AI LOGIC LANGSUNG DI SINI
 func ai_turn():
 	if isOver:
 		return
 
-	var move = ai_helper.get_best_move_for_ai(board)
+	var move = ai_helper.get_best_move_for_ai(board, AI_PLAYER, HUMAN_PLAYER)
 
 	if move == null:
 		print("AI tidak punya langkah")

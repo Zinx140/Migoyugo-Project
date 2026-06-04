@@ -1,7 +1,6 @@
 extends Node
 
 var winner: String = ""
-var currentPlayer = Constants.WHITE;
 var TRACE_CANVAS = null;
 var TRACE_CTX = null;
 
@@ -19,7 +18,6 @@ func format_move(move) -> String:
 	if not move or (typeof(move) == TYPE_DICTIONARY and move.is_empty()) or not move.has("row"): 
 		return "-"
 	return str(move.row + 1) + "-" + str(move.col + 1)
-
 
 func format_score(value) -> String:
 	if value == INF: 
@@ -79,8 +77,6 @@ func create_trace_node(params: Dictionary) -> Dictionary:
 		"children": []
 	}
 
-
-
 func init_minimax_canvas() -> void:
 	if not Constants.TRACE_CANVAS_ENABLED:
 		return
@@ -101,8 +97,6 @@ func init_minimax_canvas() -> void:
 	TRACE_CTX = self
 	
 	print("Canvas Minimax berhasil diinisialisasi menggunakan hierarki Node Godot!")
-
-
 
 func print_trace_branch(node: Dictionary, prefix: String, is_last: bool, level: int) -> void:
 	if level > Constants.TRACE_MAX_PRINT_DEPTH + 1:
@@ -147,22 +141,8 @@ func print_minimax_trace(root: Dictionary) -> void:
 
 	#draw_minimax_trace_tree(root)
 
-
-func make_ai_move(board) -> void:
-	if not Constants.AI_ENABLED or winner or currentPlayer != Constants.AI_PLAYER:
-		return
-
-	var best_move = get_best_move_for_ai(board)
-
-	if not best_move:
-		MainHelper.updateInfo("AI has no valid move.")
-		return
-
-	MainHelper.makeMove(board,best_move.row, best_move.col, Constants.AI_PLAYER)
-
-
-func get_best_move_for_ai(source_board) -> Dictionary:
-	var moves = get_top_moves(source_board, Constants.AI_PLAYER, Constants.TOP_K)
+func get_best_move_for_ai(source_board, AI_PLAYER, HUMAN_PLAYER) -> Dictionary:
+	var moves = get_top_moves(source_board, Constants.AI_PLAYER, AI_PLAYER, HUMAN_PLAYER, Constants.TOP_K)
 
 	var best_move = {} # Menggunakan Dictionary kosong sebagai pengganti null objek
 	var best_score = -INF
@@ -201,6 +181,8 @@ func get_best_move_for_ai(source_board) -> Dictionary:
 				-INF,
 				INF,
 				Constants.HUMAN_PLAYER,
+				AI_PLAYER, 
+				HUMAN_PLAYER,
 				trace_child
 			)
 
@@ -247,6 +229,8 @@ func mini_max_alpha_beta_pruning(
 	alpha: float,
 	beta: float,
 	player,
+	AI_PLAYER, 
+	HUMAN_PLAYER,
 	trace_node = null
 ) -> float:
 	
@@ -275,7 +259,7 @@ func mini_max_alpha_beta_pruning(
 			trace_node.betaEnd = beta
 		return score
 
-	var moves = get_top_moves(source_board, player, Constants.TOP_K)
+	var moves = get_top_moves(source_board, player, AI_PLAYER, HUMAN_PLAYER, Constants.TOP_K)
 
 	if moves.size() == 0:
 		var score = evaluate_board(source_board)
@@ -315,6 +299,8 @@ func mini_max_alpha_beta_pruning(
 					alpha,
 					beta,
 					MainHelper.getOpponent(player),
+					AI_PLAYER, 
+					HUMAN_PLAYER,
 					child_trace
 				)
 
@@ -368,6 +354,8 @@ func mini_max_alpha_beta_pruning(
 				alpha,
 				beta,
 				MainHelper.getOpponent(player),
+				AI_PLAYER, 
+				HUMAN_PLAYER,
 				child_trace
 			)
 
@@ -393,7 +381,7 @@ func mini_max_alpha_beta_pruning(
 
 	return best_score
 
-func get_top_moves(source_board, player, limit: int = Constants.TOP_K) -> Array:
+func get_top_moves(source_board, player, AI_PLAYER, HUMAN_PLAYER, limit: int = Constants.TOP_K) -> Array:
 	var pq = [] # Kita gunakan Array standar sebagai penampung
 
 	for row in range(Constants.BOARD_SIZE):
