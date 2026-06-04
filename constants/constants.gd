@@ -17,7 +17,7 @@ const AI_ENABLED = false;
 const HUMAN_PLAYER = WHITE;
 const AI_PLAYER = BLACK;
 const MAX_DEPTH = 3;
-const TOP_K = 10;
+const TOP_K = 5;
 
 const TRACE_MINIMAX = true;
 const TRACE_MAX_PRINT_DEPTH = MAX_DEPTH;

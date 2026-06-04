@@ -22,3 +22,4 @@ func _on_vs_player_button_down() -> void:
 func _on_vsai_button_button_down() -> void:
 	AudioManager.play_click()
 	get_tree().change_scene_to_file("res://scenes/vsai.tscn")
+	pass

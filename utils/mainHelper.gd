@@ -143,11 +143,14 @@ static func isIgo(sourceBoard, row, col, player) -> bool:
 	if not isSpecialToken(selectedToken, player):
 		return false
 
-	var count = 1
 	for direction in Constants.DIRECTIONS:
+		var count = 1
 		count += countSpecialTokenInDirection(sourceBoard, row, col, direction.dr, direction.dc, player)
+		print(count)
+		if (count >= 4):
+			return true
 
-	return count == 4
+	return false
 	
 static func getIgoBoard():
 	

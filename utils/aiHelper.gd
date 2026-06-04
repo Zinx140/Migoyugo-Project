@@ -5,11 +5,9 @@ var currentPlayer = Constants.WHITE;
 var TRACE_CANVAS = null;
 var TRACE_CTX = null;
 
-
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	pass # Replace with function body.
-
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
@@ -404,8 +402,7 @@ func get_top_moves(source_board, player, limit: int = Constants.TOP_K) -> Array:
 				continue
 
 			var result = MainHelper.simulateMove(source_board, row, col, player)
-
-			if not result.is_valid:
+			if not result.isValid:
 				continue
 
 			var score = evaluate_board(result.board)

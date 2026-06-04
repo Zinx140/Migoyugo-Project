@@ -5,6 +5,12 @@ extends GridContainer
 @onready var invalidMigoSound = get_tree().current_scene.get_node("invalidMigoEffect")
 @onready var blackTurnComp = get_tree().current_scene.get_node("VSPlayerNode/VSPlayerCanvasLayer/BlackTurn")
 @onready var whiteTurnComp = get_tree().current_scene.get_node("VSPlayerNode/VSPlayerCanvasLayer/WhiteTurn")
+@onready var blackWin = get_tree().current_scene.get_node("VSPlayerNode/VSPlayerCanvasLayer/BWin")
+@onready var whiteWin = get_tree().current_scene.get_node("VSPlayerNode/VSPlayerCanvasLayer/WWin")
+@onready var playAgainBtn = get_tree().current_scene.get_node("VSPlayerNode/VSPlayerCanvasLayer/PlayAgainBtn")
+@onready var exitBtn = get_tree().current_scene.get_node("VSPlayerNode/VSPlayerCanvasLayer/ExitBtn")
+@onready var backBtn = get_tree().current_scene.get_node("VSPlayerNode/VSPlayerCanvasLayer/BackButton")
+@onready var boardContainer = get_tree().current_scene.get_node("VSPlayerNode/VSPlayerCanvasLayer/BoardContainer")
 
 var board = MainHelper.create_empty_board();
 var currentPlayer = Constants.WHITE;
@@ -39,7 +45,20 @@ func _on_cell_pressed(row, col):
 	if result['winner'] != "":
 		isOver = true;
 		print(result['winner'], ' Win!')
+		showWinMenu(result['winner'])
+
+func showWinMenu(winner):
+	if (winner == "W"):
+		whiteWin.visible = true
+	else: 
+		blackWin.visible = true
 	
+	backBtn.visible= false
+	boardContainer.visible= false
+	whiteTurnComp.visible= false
+	blackTurnComp.visible= false
+	playAgainBtn.visible = true
+	exitBtn.visible = true
 
 func resetBoard():
 	board = MainHelper.create_empty_board();
