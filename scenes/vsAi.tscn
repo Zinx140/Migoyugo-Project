@@ -2,9 +2,13 @@
 
 [ext_resource type="Script" uid="uid://brbgi3ssq0oed" path="res://scripts/vsAi.gd" id="1_57axd"]
 [ext_resource type="Texture2D" uid="uid://b5ryy1l5brn5k" path="res://assets/imgs/main_bg.png" id="2_ljmqr"]
+[ext_resource type="Script" uid="uid://dhtoyag1fh6of" path="res://scripts/choose_side.gd" id="3_0gw23"]
+[ext_resource type="Texture2D" uid="uid://ch0ehdmw3r3l0" path="res://assets/imgs/side_bg.png" id="3_6rohl"]
 [ext_resource type="Texture2D" uid="uid://dipa7bklb4rit" path="res://assets/imgs/title.png" id="3_pj1jr"]
 [ext_resource type="Texture2D" uid="uid://dy63a2hf8qeb1" path="res://assets/imgs/black_win.png" id="4_57axd"]
+[ext_resource type="Texture2D" uid="uid://dk0n258duh4iy" path="res://assets/imgs/black_side.png" id="5_0gw23"]
 [ext_resource type="Texture2D" uid="uid://ct2akg4aes2k0" path="res://assets/imgs/white_win.png" id="5_ljmqr"]
+[ext_resource type="Texture2D" uid="uid://burdktkrbvwdu" path="res://assets/imgs/white_side.png" id="6_2hky4"]
 [ext_resource type="Texture2D" uid="uid://df2tx3lao1aku" path="res://assets/imgs/play_again.png" id="6_s7b25"]
 [ext_resource type="Script" uid="uid://gu7mmb102me1" path="res://scripts/vsAi_main.gd" id="7_0cqtl"]
 [ext_resource type="Texture2D" uid="uid://5xkude6jvj1s" path="res://assets/imgs/exit.png" id="7_2hky4"]
@@ -42,7 +46,71 @@ grow_horizontal = 2
 grow_vertical = 2
 texture = ExtResource("2_ljmqr")
 
+[node name="SideCanvasLayer" type="CanvasLayer" parent="VSAiNode" unique_id=246833300]
+script = ExtResource("3_0gw23")
+
+[node name="sideBG" type="TextureRect" parent="VSAiNode/SideCanvasLayer" unique_id=604006642]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -576.0
+offset_top = -299.0
+offset_right = 24.0
+offset_bottom = 136.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(1.9, 1.9)
+size_flags_horizontal = 4
+size_flags_vertical = 0
+texture = ExtResource("3_6rohl")
+
+[node name="Title" type="TextureRect" parent="VSAiNode/SideCanvasLayer" unique_id=1647737792]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -436.0
+offset_top = 533.0
+offset_right = 427.0
+offset_bottom = 822.0
+grow_horizontal = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+texture = ExtResource("3_pj1jr")
+
+[node name="blackSideBtn" type="TextureButton" parent="VSAiNode/SideCanvasLayer" unique_id=1793949729]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -489.0
+offset_top = 79.0
+offset_right = 218.0
+offset_bottom = 432.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(0.7, 0.7)
+texture_normal = ExtResource("5_0gw23")
+
+[node name="whiteSideBtn" type="TextureButton" parent="VSAiNode/SideCanvasLayer" unique_id=1004478382]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -43.0
+offset_top = 71.0
+offset_right = 664.0
+offset_bottom = 424.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(0.75, 0.75)
+texture_normal = ExtResource("6_2hky4")
+
 [node name="VSAiCanvasLayer" type="CanvasLayer" parent="VSAiNode" unique_id=154629131]
+visible = false
 
 [node name="Title" type="TextureRect" parent="VSAiNode/VSAiCanvasLayer" unique_id=1601742874]
 anchors_preset = 5
@@ -148,6 +216,8 @@ stream = ExtResource("13_oj2vu")
 [node name="invalidMigoEffect" type="AudioStreamPlayer2D" parent="." unique_id=1126946876]
 stream = ExtResource("14_bcpfn")
 
+[connection signal="button_down" from="VSAiNode/SideCanvasLayer/blackSideBtn" to="." method="_on_black_side_btn_button_down"]
+[connection signal="button_down" from="VSAiNode/SideCanvasLayer/whiteSideBtn" to="." method="_on_white_side_btn_button_down"]
 [connection signal="button_down" from="VSAiNode/VSAiCanvasLayer/PlayAgainBtn" to="." method="_on_play_again_btn_button_down"]
 [connection signal="button_down" from="VSAiNode/VSAiCanvasLayer/ExitBtn" to="." method="_on_exit_btn_button_down"]
 [connection signal="button_down" from="VSAiNode/VSAiCanvasLayer/BackButton" to="." method="_on_back_button_button_down"]

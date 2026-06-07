@@ -23,10 +23,33 @@ var isAiThinking = false
 func _ready() -> void:
 	columns = Constants.BOARD_SIZE
 	init_board_buttons()
+	set_board_input_enabled(false)
+
+func start_game(human_side) -> void:
+	HUMAN_PLAYER = human_side
+	AI_PLAYER = getOpponent(HUMAN_PLAYER)
+
+	board = MainHelper.create_empty_board()
+	currentPlayer = Constants.WHITE # putih selalu mulai dulu
+	isOver = false
+	isAiThinking = false
+
+	whiteWin.visible = false
+	blackWin.visible = false
+	playAgainBtn.visible = false
+	exitBtn.visible = false
+	backBtn.visible = true
+
+	boardContainer.mouse_filter = Control.MOUSE_FILTER_STOP
+	boardGridContainer.mouse_filter = Control.MOUSE_FILTER_STOP
+
+	render_board()
 	renderTurnComp()
+
 	if currentPlayer == AI_PLAYER:
 		isAiThinking = true
 		set_board_input_enabled(false)
+
 		await get_tree().create_timer(0.3).timeout
 		ai_turn()
 	else:
