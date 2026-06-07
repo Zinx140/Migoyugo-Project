@@ -89,7 +89,7 @@ static func canPlaceMigo(sourceBoard, row, col, player):
 			return false
 	return true
 
-static func resolveYugo(sourceBoard, row, col, player) -> int:
+static func resolveYugo(sourceBoard, row, col, player, play_audio: bool = true) -> int:
 	var matchedAxes = []
 	var cellsToClear = {}
 
@@ -110,7 +110,8 @@ static func resolveYugo(sourceBoard, row, col, player) -> int:
 	for cell in cellsToClear.values():
 		sourceBoard[cell.row][cell.col] = Constants.EMPTY
 	
-	AudioManager.play_yugo()
+	if play_audio:
+		AudioManager.play_yugo()
 
 	if matchedAxes.size() > 3:
 		sourceBoard[row][col] = "S" + str(player)
@@ -181,7 +182,7 @@ static func getIgoBoard():
 	
 	pass
 
-static func simulateMove(sourceBoard, row, col, player) -> Dictionary:
+static func simulateMove(sourceBoard, row, col, player, play_audio: bool = true) -> Dictionary:
 	if not isInsideBoard(row, col):
 		return {
 			"isValid": false,
@@ -209,7 +210,7 @@ static func simulateMove(sourceBoard, row, col, player) -> Dictionary:
 			"winner": ""
 		}
 
-	resolveYugo(newBoard, row, col, player)
+	resolveYugo(newBoard, row, col, player, play_audio)
 	var hasIgo = isIgo(newBoard, row, col, player)
 	
 	return {
@@ -300,7 +301,6 @@ static func makeMove(board, row, col, player) -> Dictionary:
 	var result = MainHelper.simulateMove(board, row, col, player)
 
 	if not result.isValid:
-		print(result.message)
 		result["next_player"] = player
 		return result
 

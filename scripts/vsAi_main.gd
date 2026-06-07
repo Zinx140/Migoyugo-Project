@@ -3,30 +3,43 @@ extends GridContainer
 
 @onready var placingMigoSound = get_tree().current_scene.get_node("placingMigoEffect")
 @onready var invalidMigoSound = get_tree().current_scene.get_node("invalidMigoEffect")
-@onready var blackTurnComp = get_tree().current_scene.get_node("VSPlayerNode/VSPlayerCanvasLayer/BlackTurn")
-@onready var whiteTurnComp = get_tree().current_scene.get_node("VSPlayerNode/VSPlayerCanvasLayer/WhiteTurn")
-@onready var blackWin = get_tree().current_scene.get_node("VSPlayerNode/VSPlayerCanvasLayer/BWin")
-@onready var whiteWin = get_tree().current_scene.get_node("VSPlayerNode/VSPlayerCanvasLayer/WWin")
-@onready var playAgainBtn = get_tree().current_scene.get_node("VSPlayerNode/VSPlayerCanvasLayer/PlayAgainBtn")
-@onready var exitBtn = get_tree().current_scene.get_node("VSPlayerNode/VSPlayerCanvasLayer/ExitBtn")
-@onready var backBtn = get_tree().current_scene.get_node("VSPlayerNode/VSPlayerCanvasLayer/BackButton")
-@onready var boardContainer = get_tree().current_scene.get_node("VSPlayerNode/VSPlayerCanvasLayer/BoardContainer")
-@onready var boardGridContainer = get_tree().current_scene.get_node("VSPlayerNode/VSPlayerCanvasLayer/BoardContainer/BoardGridContainer")
-@onready var ai_helper = preload("res://utils/aiHelper.gd").new()
+@onready var blackTurnComp = get_tree().current_scene.get_node("VSAiNode/VSAiCanvasLayer/BlackTurn")
+@onready var whiteTurnComp = get_tree().current_scene.get_node("VSAiNode/VSAiCanvasLayer/WhiteTurn")
+@onready var blackWin = get_tree().current_scene.get_node("VSAiNode/VSAiCanvasLayer/BWin")
+@onready var whiteWin = get_tree().current_scene.get_node("VSAiNode/VSAiCanvasLayer/WWin")
+@onready var playAgainBtn = get_tree().current_scene.get_node("VSAiNode/VSAiCanvasLayer/PlayAgainBtn")
+@onready var exitBtn = get_tree().current_scene.get_node("VSAiNode/VSAiCanvasLayer/ExitBtn")
+@onready var backBtn = get_tree().current_scene.get_node("VSAiNode/VSAiCanvasLayer/BackButton")
+@onready var boardContainer = get_tree().current_scene.get_node("VSAiNode/VSAiCanvasLayer/BoardContainer")
+@onready var boardGridContainer = get_tree().current_scene.get_node("VSAiNode/VSAiCanvasLayer/BoardContainer/BoardGridContainer")
 
 var board = MainHelper.create_empty_board();
 var currentPlayer = Constants.WHITE;
 var isOver = false;
-var AI_PLAYER = Constants.BLACK
-var HUMAN_PLAYER = Constants.WHITE
+var AI_PLAYER = Constants.WHITE
+var HUMAN_PLAYER = Constants.BLACK
+var isAiThinking = false
 
 func _ready() -> void:
 	columns = Constants.BOARD_SIZE
 	init_board_buttons()
 	renderTurnComp()
-	if (currentPlayer == AI_PLAYER):
+	if currentPlayer == AI_PLAYER:
+		isAiThinking = true
+		set_board_input_enabled(false)
+		await get_tree().create_timer(0.3).timeout
 		ai_turn()
-
+	else:
+		set_board_input_enabled(true)
+		
+func set_board_input_enabled(enabled: bool) -> void:
+	for child in get_children():
+		var btn = child as TextureButton
+		
+		if btn:
+			btn.disabled = not enabled
+			btn.mouse_filter = Control.MOUSE_FILTER_STOP if enabled else Control.MOUSE_FILTER_IGNORE
+			
 func renderTurnComp():
 	if currentPlayer == Constants.WHITE:
 		whiteTurnComp.visible = true
@@ -36,8 +49,7 @@ func renderTurnComp():
 		blackTurnComp.visible = true
 
 func _on_cell_pressed(row, col):
-	# 🚫 block kalau game over atau AI turn
-	if isOver or currentPlayer == AI_PLAYER:
+	if isOver or isAiThinking or currentPlayer != HUMAN_PLAYER:
 		return
 	
 	var result = MainHelper.makeMove(board, row, col, currentPlayer)
@@ -56,6 +68,9 @@ func _on_cell_pressed(row, col):
 		
 		# 🤖 AI jalan setelah player
 		if not isOver:
+			isAiThinking = true
+			set_board_input_enabled(false)
+			
 			await get_tree().create_timer(0.3).timeout
 			ai_turn()
 	else:
@@ -64,27 +79,54 @@ func _on_cell_pressed(row, col):
 # 🤖 AI LOGIC LANGSUNG DI SINI
 func ai_turn():
 	if isOver:
+		isAiThinking = false
+		set_board_input_enabled(false)
+		return
+	
+	if currentPlayer != AI_PLAYER:
+		isAiThinking = false
+		set_board_input_enabled(true)
 		return
 
-	var move = ai_helper.get_best_move_for_ai(board, AI_PLAYER, HUMAN_PLAYER)
+	isAiThinking = true
+	set_board_input_enabled(false)
 
-	if move == null:
+	var move = AiHelper.get_best_move_for_ai(board, AI_PLAYER, HUMAN_PLAYER)
+
+	if move == null or move["row"] == -1 or move["col"] == -1:
 		print("AI tidak punya langkah")
+		currentPlayer = HUMAN_PLAYER
+		renderTurnComp()
+		isAiThinking = false
+		set_board_input_enabled(true)
 		return
 
-	var result = MainHelper.makeMove(board, move.row, move.col, AI_PLAYER)
+	var result = MainHelper.makeMove(board, move["row"], move["col"], AI_PLAYER)
 
-	if result["isValid"]:
-		placingMigoSound.play()
-		board = result["board"]
-		render_board()
-
-		currentPlayer = getOpponent(currentPlayer)
+	if not result["isValid"]:
+		print("AI memilih langkah invalid: ", move)
+		currentPlayer = HUMAN_PLAYER
 		renderTurnComp()
+		isAiThinking = false
+		set_board_input_enabled(true)
+		return
 
-		if result["winner"] != "":
-			isOver = true
-			print(result["winner"], " Win!")
+	placingMigoSound.play()
+	board = result["board"]
+	render_board()
+
+	currentPlayer = getOpponent(currentPlayer)
+	renderTurnComp()
+
+	if result["winner"] != "":
+		isOver = true
+		print(result["winner"], " Win!")
+		showWinMenu(result["winner"])
+		set_board_input_enabled(false)
+		return
+
+	isAiThinking = false
+	set_board_input_enabled(true)
 
 func showWinMenu(winner):
 	if (winner == "W"):

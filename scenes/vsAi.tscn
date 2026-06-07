@@ -30,11 +30,11 @@ tags = {
 [node name="VsAi" type="Node2D" unique_id=631257563]
 script = ExtResource("1_57axd")
 
-[node name="VSPlayerNode" type="Node2D" parent="." unique_id=342162925]
+[node name="VSAiNode" type="Node2D" parent="." unique_id=342162925]
 
-[node name="VSPlayerBackground" type="ParallaxBackground" parent="VSPlayerNode" unique_id=1020601333]
+[node name="VSAiBackground" type="ParallaxBackground" parent="VSAiNode" unique_id=1020601333]
 
-[node name="VSPlayer_bg" type="TextureRect" parent="VSPlayerNode/VSPlayerBackground" unique_id=804670404]
+[node name="VSPlayer_bg" type="TextureRect" parent="VSAiNode/VSAiBackground" unique_id=804670404]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -42,9 +42,9 @@ grow_horizontal = 2
 grow_vertical = 2
 texture = ExtResource("2_ljmqr")
 
-[node name="VSPlayerCanvasLayer" type="CanvasLayer" parent="VSPlayerNode" unique_id=154629131]
+[node name="VSAiCanvasLayer" type="CanvasLayer" parent="VSAiNode" unique_id=154629131]
 
-[node name="Title" type="TextureRect" parent="VSPlayerNode/VSPlayerCanvasLayer" unique_id=1601742874]
+[node name="Title" type="TextureRect" parent="VSAiNode/VSAiCanvasLayer" unique_id=1601742874]
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
@@ -58,7 +58,7 @@ size_flags_horizontal = 4
 size_flags_vertical = 0
 texture = ExtResource("3_pj1jr")
 
-[node name="BWin" type="TextureRect" parent="VSPlayerNode/VSPlayerCanvasLayer" unique_id=1826449635]
+[node name="BWin" type="TextureRect" parent="VSAiNode/VSAiCanvasLayer" unique_id=1826449635]
 visible = false
 offset_left = 36.8
 offset_top = 444.0
@@ -67,7 +67,7 @@ offset_bottom = 667.0
 scale = Vector2(0.9, 0.9)
 texture = ExtResource("4_57axd")
 
-[node name="WWin" type="TextureRect" parent="VSPlayerNode/VSPlayerCanvasLayer" unique_id=288371505]
+[node name="WWin" type="TextureRect" parent="VSAiNode/VSAiCanvasLayer" unique_id=288371505]
 visible = false
 offset_left = 36.0
 offset_top = 444.0
@@ -76,7 +76,7 @@ offset_bottom = 667.0
 scale = Vector2(0.9, 0.9)
 texture = ExtResource("5_ljmqr")
 
-[node name="PlayAgainBtn" type="TextureButton" parent="VSPlayerNode/VSPlayerCanvasLayer" unique_id=1268394641]
+[node name="PlayAgainBtn" type="TextureButton" parent="VSAiNode/VSAiCanvasLayer" unique_id=1268394641]
 visible = false
 offset_left = 145.0
 offset_top = 1731.0
@@ -85,7 +85,7 @@ offset_bottom = 1981.0
 scale = Vector2(0.8, 0.8)
 texture_normal = ExtResource("6_s7b25")
 
-[node name="ExitBtn" type="TextureButton" parent="VSPlayerNode/VSPlayerCanvasLayer" unique_id=704547208]
+[node name="ExitBtn" type="TextureButton" parent="VSAiNode/VSAiCanvasLayer" unique_id=704547208]
 visible = false
 offset_left = 197.0
 offset_top = 1955.0
@@ -94,7 +94,7 @@ offset_bottom = 2205.0
 scale = Vector2(0.7, 0.7)
 texture_normal = ExtResource("7_2hky4")
 
-[node name="BoardContainer" type="CenterContainer" parent="VSPlayerNode/VSPlayerCanvasLayer" unique_id=841303779]
+[node name="BoardContainer" type="CenterContainer" parent="VSAiNode/VSAiCanvasLayer" unique_id=841303779]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -103,11 +103,11 @@ grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="BoardGridContainer" type="GridContainer" parent="VSPlayerNode/VSPlayerCanvasLayer/BoardContainer" unique_id=1035931661]
+[node name="BoardGridContainer" type="GridContainer" parent="VSAiNode/VSAiCanvasLayer/BoardContainer" unique_id=1035931661]
 layout_mode = 2
 script = ExtResource("7_0cqtl")
 
-[node name="BackButton" type="TextureButton" parent="VSPlayerNode/VSPlayerCanvasLayer" unique_id=480439985]
+[node name="BackButton" type="TextureButton" parent="VSAiNode/VSAiCanvasLayer" unique_id=480439985]
 offset_left = 50.0
 offset_top = 450.0
 offset_right = 550.0
@@ -115,7 +115,7 @@ offset_bottom = 950.0
 scale = Vector2(0.4, 0.4)
 texture_normal = ExtResource("9_3tp1k")
 
-[node name="BlackTurn" type="TextureRect" parent="VSPlayerNode/VSPlayerCanvasLayer" unique_id=1990430433]
+[node name="BlackTurn" type="TextureRect" parent="VSAiNode/VSAiCanvasLayer" unique_id=1990430433]
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
@@ -127,7 +127,7 @@ grow_horizontal = 2
 scale = Vector2(0.5, 0.5)
 texture = ExtResource("10_bfdhq")
 
-[node name="WhiteTurn" type="TextureRect" parent="VSPlayerNode/VSPlayerCanvasLayer" unique_id=1078025910]
+[node name="WhiteTurn" type="TextureRect" parent="VSAiNode/VSAiCanvasLayer" unique_id=1078025910]
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
@@ -148,6 +148,6 @@ stream = ExtResource("13_oj2vu")
 [node name="invalidMigoEffect" type="AudioStreamPlayer2D" parent="." unique_id=1126946876]
 stream = ExtResource("14_bcpfn")
 
-[connection signal="button_down" from="VSPlayerNode/VSPlayerCanvasLayer/PlayAgainBtn" to="." method="_on_play_again_btn_button_down"]
-[connection signal="button_down" from="VSPlayerNode/VSPlayerCanvasLayer/ExitBtn" to="." method="_on_exit_btn_button_down"]
-[connection signal="button_down" from="VSPlayerNode/VSPlayerCanvasLayer/BackButton" to="." method="_on_back_button_button_down"]
+[connection signal="button_down" from="VSAiNode/VSAiCanvasLayer/PlayAgainBtn" to="." method="_on_play_again_btn_button_down"]
+[connection signal="button_down" from="VSAiNode/VSAiCanvasLayer/ExitBtn" to="." method="_on_exit_btn_button_down"]
+[connection signal="button_down" from="VSAiNode/VSAiCanvasLayer/BackButton" to="." method="_on_back_button_button_down"]

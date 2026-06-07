@@ -17,7 +17,7 @@ const AI_ENABLED = false;
 const HUMAN_PLAYER = WHITE;
 const AI_PLAYER = BLACK;
 const MAX_DEPTH = 3;
-const TOP_K = 5;
+const TOP_K = 3;
 
 const TRACE_MINIMAX = true;
 const TRACE_MAX_PRINT_DEPTH = MAX_DEPTH;
@@ -56,15 +56,4 @@ const DIRECTIONS = [
 	{ "dr": -1, "dc": 1 },
 	{ "dr": 1, "dc": -1 },
 	{ "dr": 1, "dc": 1 }
-]
-
-const SCORE_TILES = [
-	[1, 1, 1, 1, 1, 1, 1, 1],
-	[1, 1, 1, 1, 1, 1, 1, 1],
-	[1, 1, 3, 2, 2, 3, 1, 1],
-	[1, 1, 2, 2, 2, 2, 1, 1],
-	[1, 1, 2, 2, 2, 2, 1, 1],
-	[1, 1, 3, 2, 2, 3, 1, 1],
-	[1, 1, 1, 1, 1, 1, 1, 1],
-	[1, 1, 1, 1, 1, 1, 1, 1]
 ]
