@@ -19,7 +19,6 @@ func _on_vs_player_button_button_down() -> void:
 	)
 	pass # Replace with function body.
 
-
 func _on_vsai_button_button_down() -> void:
 	AudioManager.play_click()
 	get_tree().change_scene_to_file(
@@ -27,7 +26,9 @@ func _on_vsai_button_button_down() -> void:
 	)
 	pass # Replace with function body.
 
-
 func _on_how_to_play_btn_button_down() -> void:
 	AudioManager.play_click()
+	get_tree().change_scene_to_file(
+		"res://scenes/rule.tscn"
+	)
 	pass # Replace with function body.
