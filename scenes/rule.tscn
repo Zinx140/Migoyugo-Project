@@ -1,0 +1,35 @@
+[gd_scene format=3 uid="uid://d0ma7m37h6ltg"]
+
+[ext_resource type="Script" uid="uid://bhx0wexlmd2fg" path="res://scripts/rule.gd" id="1_y0tvx"]
+[ext_resource type="Texture2D" uid="uid://d7tmsrpnwdk" path="res://assets/imgs/backBtn.png" id="2_obe7d"]
+[ext_resource type="Texture2D" uid="uid://bg73sask0yqbs" path="res://assets/imgs/rule_bg.png" id="3_702p1"]
+
+[node name="Rule" type="Node2D" unique_id=1744045226]
+script = ExtResource("1_y0tvx")
+
+[node name="RuleNode" type="Node2D" parent="." unique_id=981735158]
+
+[node name="RuleCanvasLayer" type="CanvasLayer" parent="RuleNode" unique_id=425450962]
+follow_viewport_enabled = true
+
+[node name="BackButton" type="TextureButton" parent="RuleNode/RuleCanvasLayer" unique_id=1754711789]
+offset_left = 70.99999
+offset_top = 92.00004
+offset_right = 571.0
+offset_bottom = 592.00006
+scale = Vector2(0.4, 0.4)
+texture_normal = ExtResource("2_obe7d")
+
+[node name="RuleBackground" type="ParallaxBackground" parent="RuleNode" unique_id=61191082]
+layer = 0
+follow_viewport_enabled = true
+
+[node name="menu_bg" type="TextureRect" parent="RuleNode/RuleBackground" unique_id=2089802289]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("3_702p1")
+
+[connection signal="button_down" from="RuleNode/RuleCanvasLayer/BackButton" to="." method="_on_back_button_button_down"]
