@@ -26,3 +26,8 @@ func _on_vsai_button_button_down() -> void:
 		"res://scenes/vsAi.tscn"
 	)
 	pass # Replace with function body.
+
+
+func _on_how_to_play_btn_button_down() -> void:
+	AudioManager.play_click()
+	pass # Replace with function body.
