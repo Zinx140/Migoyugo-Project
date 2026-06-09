@@ -72,6 +72,7 @@ func showWinMenu(winner):
 	exitBtn.visible = true
 
 func resetBoard():
+	clear_igo_marks()
 	board = MainHelper.create_empty_board();
 	render_board()
 
@@ -140,3 +141,15 @@ func mark_cell(row: int, col: int) -> void:
 
 	border_panel.add_theme_stylebox_override("panel", style_box)
 	btn.add_child(border_panel)
+	
+func clear_igo_marks() -> void:
+	for child in get_children():
+		var btn = child as TextureButton
+		
+		if not btn:
+			continue
+		
+		var existing_border = btn.get_node_or_null("IgoBorder")
+		
+		if existing_border:
+			existing_border.queue_free()
