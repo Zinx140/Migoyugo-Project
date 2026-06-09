@@ -16,8 +16,8 @@ static func evaluateBoard(row, col, board, curr_turn) -> Dictionary:
 	var move_result = MainHelper.simulateMove(board, row, col, curr_turn, false)
 	var score = AIConstants.SCORE_TILES[row][col]
 	
-	if isInvalidMove(move_result):
-		score += getInvalidMoveScore()
+	if not move_result["isValid"]:
+		score += AIConstants.OWN_INVALID_MOVE
 		
 		return {
 			"row": row,
@@ -30,6 +30,7 @@ static func evaluateBoard(row, col, board, curr_turn) -> Dictionary:
 	
 	score += getYugoAttackScore(row, col, board, curr_turn)
 	score += getMigoNearbyScore(row, col, board, curr_turn)
+	score += getBlockOpponentFutureOpenSpecialThreeScore(row, col, board, curr_turn)
 	score += getBlockOpponentYugoScore(row, col, board, curr_turn)
 	score += getUnsafeYugoPenalty(row, col, board, new_board, move_result, curr_turn)
 	score += getOwnSpecialThreeScore(row, col, new_board, curr_turn)
@@ -43,11 +44,38 @@ static func evaluateBoard(row, col, board, curr_turn) -> Dictionary:
 		"score": score,
 	}
 
-static func isInvalidMove(move_result: Dictionary) -> bool:
-	return not move_result["isValid"]
-
-static func getInvalidMoveScore() -> int:
-	return AIConstants.OWN_INVALID_MOVE
+static func evaluateBoardState(board, AI_PLAYER, HUMAN_PLAYER) -> int:
+	var score := 0
+	
+	for row in range(Constants.BOARD_SIZE):
+		for col in range(Constants.BOARD_SIZE):
+			var token = board[row][col]
+			
+			if token == Constants.EMPTY:
+				continue
+			
+			var owner = MainHelper.getTokenOwner(token)
+			
+			if owner == null:
+				continue
+			
+			var token_score = MainHelper.getTokenScore(token)
+			var tile_score = AIConstants.SCORE_TILES[row][col]
+			
+			if owner == AI_PLAYER:
+				score += token_score
+				score += tile_score
+			elif owner == HUMAN_PLAYER:
+				score -= token_score
+				score -= tile_score
+				
+	score += countOpenSpecialThreeThreatScore(board, AI_PLAYER) * AIConstants.SELF_OPEN_SPECIAL_THREE
+	score -= countOpenSpecialThreeThreatScore(board, HUMAN_PLAYER) * abs(AIConstants.OPPONENT_OPEN_SPECIAL_THREE_THREAT)
+	
+	score += countFutureOpenSpecialThreeThreatScore(board, AI_PLAYER) * AIConstants.BLOCK_FUTURE_OPEN_SPECIAL_THREE
+	score -= countFutureOpenSpecialThreeThreatScore(board, HUMAN_PLAYER) * AIConstants.BLOCK_FUTURE_OPEN_SPECIAL_THREE
+	
+	return score
 
 static func getYugoAttackScore(row, col, board, curr_turn) -> int:
 	var score := 0
@@ -367,3 +395,76 @@ static func countOpenEndsForSpecialLine(board, row, col, dr, dc, player) -> int:
 		open_ends += 1
 
 	return open_ends
+
+static func getBlockOpponentFutureOpenSpecialThreeScore(row, col, board, curr_turn) -> int:
+	var opponent = MainHelper.getOpponent(curr_turn)
+
+	var opponent_result = MainHelper.simulateMove(board, row, col, opponent, false)
+
+	if not opponent_result["isValid"]:
+		return 0
+
+	if opponent_result["winner"] == opponent:
+		return -AIConstants.LOSE_NEXT_TURN_SCORE
+
+	var opponent_board = opponent_result["board"]
+	var token_after_move = opponent_board[row][col]
+
+	if not MainHelper.isSpecialToken(token_after_move, opponent):
+		return 0
+
+	var open_three_score = getSpecialThreeLineScore(
+		opponent_board,
+		row,
+		col,
+		opponent
+	)
+
+	if open_three_score <= 0:
+		return 0
+
+	var score = open_three_score * AIConstants.BLOCK_FUTURE_OPEN_SPECIAL_THREE
+	score += getCenterBlockBonus(row, col)
+
+	return score
+	
+static func getCenterBlockBonus(row, col) -> int:
+	var distance = getDistanceFromCenter(row, col)
+
+	if distance == 0:
+		return 3000
+	elif distance == 1:
+		return 1500
+	elif distance == 2:
+		return 700
+
+	return 0
+	
+static func countFutureOpenSpecialThreeThreatScore(board, player) -> int:
+	var total_score := 0
+	
+	for row in range(Constants.BOARD_SIZE):
+		for col in range(Constants.BOARD_SIZE):
+			if board[row][col] != Constants.EMPTY:
+				continue
+			
+			var result = MainHelper.simulateMove(board, row, col, player, false)
+			
+			if not result["isValid"]:
+				continue
+			
+			var token_after_move = result["board"][row][col]
+			
+			if not MainHelper.isSpecialToken(token_after_move, player):
+				continue
+			
+			var special_three_score = getSpecialThreeLineScore(
+				result["board"],
+				row,
+				col,
+				player
+			)
+			
+			total_score += special_three_score
+	
+	return total_score

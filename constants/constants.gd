@@ -6,7 +6,7 @@ const WHITE = "W";
 const BLACK = "B";
 const XWHITE = "XW";
 const XBLACK = "XB";
-const OWHITE = "OW"; #oval
+const OWHITE = "OW";
 const OBLACK = "OB";
 const TWHITE = "TW";
 const TBLACK = "TB";
@@ -16,18 +16,8 @@ const EMPTY = "";
 const AI_ENABLED = false;
 const HUMAN_PLAYER = WHITE;
 const AI_PLAYER = BLACK;
-const MAX_DEPTH = 3;
+const MAX_DEPTH = 5;
 const TOP_K = 3;
-
-const TRACE_MINIMAX = true;
-const TRACE_MAX_PRINT_DEPTH = MAX_DEPTH;
-const TRACE_MAX_CHILDREN_PER_NODE = TOP_K;
-
-const TRACE_CANVAS_ENABLED = true;
-const TRACE_NODE_WIDTH = 150;
-const TRACE_NODE_HEIGHT = 70;
-const TRACE_HORIZONTAL_GAP = 40;
-const TRACE_VERTICAL_GAP = 120;
 
 const BLACK_MIGO = "res://assets/imgs/black_migo.png"
 const WHITE_MIGO = "res://assets/imgs/white_migo.png"
