@@ -30,23 +30,32 @@ func renderTurnComp():
 		blackTurnComp.visible = true
 
 func _on_cell_pressed(row, col):
-	if (isOver): return
+	if isOver:
+		return
 	
-	var result = MainHelper.makeMove(board, row, col, currentPlayer)
+	var playedPlayer = currentPlayer
+	var result = MainHelper.makeMove(board, row, col, playedPlayer)
 	
-	if (result['isValid']):
+	if result["isValid"]:
 		placingMigoSound.play()
-		board = result['board']
+		board = result["board"]
 		render_board()
+		
+		if result["winner"] != "":
+			isOver = true
+			
+			var igo_cells = MainHelper.getIgoBoard(board, row, col, playedPlayer)
+			mark_igo_cells(igo_cells)
+			
+			print(igo_cells)
+			print(result["winner"], " Win!")
+			showWinMenu(result["winner"])
+			return
+		
 		currentPlayer = getOpponent(currentPlayer)
 		renderTurnComp()
 	else:
 		invalidMigoSound.play()
-		
-	if result['winner'] != "":
-		isOver = true;
-		print(result['winner'], ' Win!')
-		showWinMenu(result['winner'])
 
 func showWinMenu(winner):
 	if (winner == "W"):
@@ -101,7 +110,11 @@ func render_board():
 
 			# reset texture dulu
 			btn.texture_normal = load(CompHelper.getTilesPath(cell))
-		
+
+func mark_igo_cells(igo_cells):
+	for cell in igo_cells:
+		mark_cell(cell['row'], cell['col'])
+
 func mark_cell(row: int, col: int) -> void:
 	var index = row * Constants.BOARD_SIZE + col
 	var btn = get_child(index) as TextureButton

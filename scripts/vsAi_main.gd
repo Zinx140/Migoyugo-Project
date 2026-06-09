@@ -75,21 +75,28 @@ func _on_cell_pressed(row, col):
 	if isOver or isAiThinking or currentPlayer != HUMAN_PLAYER:
 		return
 	
-	var result = MainHelper.makeMove(board, row, col, currentPlayer)
+	var playedPlayer = currentPlayer
+	var result = MainHelper.makeMove(board, row, col, playedPlayer)
 	
-	if (result['isValid']):
+	if result["isValid"]:
 		placingMigoSound.play()
-		board = result['board']
+		board = result["board"]
 		render_board()
+		
+		if result["winner"] != "":
+			isOver = true
+			
+			var igo_cells = MainHelper.getIgoBoard(board, row, col, playedPlayer)
+			mark_igo_cells(igo_cells)
+			
+			print(igo_cells)
+			print(result["winner"], " Win!")
+			showWinMenu(result["winner"])
+			return
+		
 		currentPlayer = getOpponent(currentPlayer)
 		renderTurnComp()
 		
-		if result['winner'] != "":
-			isOver = true;
-			print(result['winner'], ' Win!')
-			showWinMenu(result['winner'])
-		
-		# 🤖 AI jalan setelah player
 		if not isOver:
 			isAiThinking = true
 			set_board_input_enabled(false)
@@ -138,15 +145,20 @@ func ai_turn():
 	board = result["board"]
 	render_board()
 
-	currentPlayer = getOpponent(currentPlayer)
-	renderTurnComp()
-
 	if result["winner"] != "":
 		isOver = true
+		
+		var igo_cells = MainHelper.getIgoBoard(board, move["row"], move["col"], AI_PLAYER)
+		mark_igo_cells(igo_cells)
+		
+		print(igo_cells)
 		print(result["winner"], " Win!")
 		showWinMenu(result["winner"])
 		set_board_input_enabled(false)
 		return
+
+	currentPlayer = getOpponent(currentPlayer)
+	renderTurnComp()
 
 	isAiThinking = false
 	set_board_input_enabled(true)
@@ -205,6 +217,10 @@ func render_board():
 			# reset texture dulu
 			btn.texture_normal = load(CompHelper.getTilesPath(cell))
 		
+func mark_igo_cells(igo_cells):
+	for cell in igo_cells:
+		mark_cell(cell['row'], cell['col'])
+
 func mark_cell(row: int, col: int) -> void:
 	var index = row * Constants.BOARD_SIZE + col
 	var btn = get_child(index) as TextureButton

@@ -138,6 +138,19 @@ static func countSpecialTokenInDirection(sourceBoard, row, col, dr: int, dc: int
 		currentCol += dc
 
 	return count
+	
+static func collectSpecialTokenCellsInDirection(sourceBoard, row, col, dr: int, dc: int, player, cells: Array) -> void:
+	var currentRow = row + dr
+	var currentCol = col + dc
+
+	while isInsideBoard(currentRow, currentCol) and isSpecialToken(sourceBoard[currentRow][currentCol], player):
+		cells.append({
+			"row": currentRow,
+			"col": currentCol
+		})
+
+		currentRow += dr
+		currentCol += dc
 
 static func isIgo(sourceBoard, row, col, player) -> bool:
 	var selectedToken = sourceBoard[row][col]
@@ -178,9 +191,58 @@ static func isIgo(sourceBoard, row, col, player) -> bool:
 
 	return false
 	
-static func getIgoBoard():
-	
-	pass
+static func getIgoBoard(sourceBoard, row, col, player) -> Array:
+	var selectedToken = sourceBoard[row][col]
+	var igo_cells = []
+	var used_cells = {}
+
+	if not isSpecialToken(selectedToken, player):
+		return []
+
+	var directionPairs = [
+		[[1, 0], [-1, 0]],    # bawah + atas
+		[[0, 1], [0, -1]],    # kanan + kiri
+		[[1, 1], [-1, -1]],   # kanan bawah + kiri atas
+		[[1, -1], [-1, 1]]    # kiri bawah + kanan atas
+	]
+
+	for pair in directionPairs:
+		var line_cells = []
+
+		line_cells.append({
+			"row": row,
+			"col": col
+		})
+
+		collectSpecialTokenCellsInDirection(
+			sourceBoard,
+			row,
+			col,
+			pair[0][0],
+			pair[0][1],
+			player,
+			line_cells
+		)
+
+		collectSpecialTokenCellsInDirection(
+			sourceBoard,
+			row,
+			col,
+			pair[1][0],
+			pair[1][1],
+			player,
+			line_cells
+		)
+
+		if line_cells.size() >= 4:
+			for cell in line_cells:
+				var key = str(cell["row"]) + "-" + str(cell["col"])
+
+				if not used_cells.has(key):
+					used_cells[key] = true
+					igo_cells.append(cell)
+
+	return igo_cells
 
 static func simulateMove(sourceBoard, row, col, player, play_audio: bool = true) -> Dictionary:
 	if not isInsideBoard(row, col):
@@ -207,7 +269,7 @@ static func simulateMove(sourceBoard, row, col, player, play_audio: bool = true)
 			"isValid": false,
 			"message": "Can't be placed here.",
 			"board": sourceBoard,
-			"winner": ""
+			"winner": "",
 		}
 
 	resolveYugo(newBoard, row, col, player, play_audio)
@@ -217,7 +279,7 @@ static func simulateMove(sourceBoard, row, col, player, play_audio: bool = true)
 		"isValid": true,
 		"message": "Success",
 		"board": newBoard,
-		"winner": player if hasIgo else ""
+		"winner": player if hasIgo else "",
 	}
 
 static func updateInfo(currentPlayer, message: String = "") -> void:
