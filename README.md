@@ -1,16 +1,16 @@
-<center>
+<div align="center">
     <img src="./assets/imgs/title.png" width="500px">
-</center>
+</div>
 <br />
 
 # The Game Overview
 
 Migoyugo is an abstract strategy board game for two players that features complete information, meaning there is no reliance on luck or chance. Players compete to win the game by either creating an Igo, which is achieved by forming an unbroken line of 4 Yugos, or by accumulating a higher Yugo score if the game ends in a Wego.
 
-<center>
+<div align="center">
     <img src="./assets/imgs/menu_demo.png" width="250px">
     <img src="./assets/imgs/game_demo.png" width="250px">
-</center>
+</div>
 
 <br />
 
@@ -32,27 +32,27 @@ The Migoyugo board is an 8 X 8 grid of 64 squares (typically all the same color)
 
 1. Single Yugo (1 line): Represented by a dot (•) in the center — worth 1 point
 
-<center>
+<div align="center">
     <img src="./assets/imgs/black_yugo.png" width="100px">
-</center>
+</div>
 
 2. Double Yugo (2 lines): Represented by an oval (⬭) in the center — worth 2 points
 
-<center>
+<div align="center">
     <img src="./assets/imgs/Owhite.png" width="100px">
-</center>
+</div>
 
 3. Triple Yugo (3 lines): Represented by a triangle (▲) in the center — worth 3 points
 
-<center>
+<div align="center">
     <img src="./assets/imgs/tblack_yugo.png" width="100px">
-</center>
+</div>
 
 4. Square Yugo (4 lines: vertical, horizontal, and 2 diagonals): Represented by a square (■) in the center — worth 4 points
 
-<center>
+<div align="center">
     <img src="./assets/imgs/swhite_yugo.png" width="100px">
-</center>
+</div>
 
 - At no time may either player create an unbroken line of more than 4 in a row of any combination of Migos and/or Yugos of their own color (multiple intersecting lines are permitted)
   <br />
