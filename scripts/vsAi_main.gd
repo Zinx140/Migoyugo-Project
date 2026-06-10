@@ -271,4 +271,3 @@ func clear_igo_marks() -> void:
 
 		if existing_border:
 			existing_border.queue_free()
-
