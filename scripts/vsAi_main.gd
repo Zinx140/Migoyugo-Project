@@ -55,19 +55,19 @@ func start_game(human_side) -> void:
 		ai_turn()
 	else:
 		set_board_input_enabled(true)
-		
+
 func set_board_input_enabled(enabled: bool) -> void:
 	for child in get_children():
 		var btn = child as TextureButton
-		
+
 		if btn:
 			btn.disabled = not enabled
 			btn.mouse_filter = Control.MOUSE_FILTER_STOP if enabled else Control.MOUSE_FILTER_IGNORE
-			
+
 func renderTurnComp():
 	if currentPlayer == Constants.WHITE:
 		whiteTurnComp.visible = true
-		blackTurnComp.visible = false		
+		blackTurnComp.visible = false
 	else:
 		whiteTurnComp.visible = false
 		blackTurnComp.visible = true
@@ -75,33 +75,33 @@ func renderTurnComp():
 func _on_cell_pressed(row, col):
 	if isOver or isAiThinking or currentPlayer != HUMAN_PLAYER:
 		return
-	
+
 	var playedPlayer = currentPlayer
 	var result = MainHelper.makeMove(board, row, col, playedPlayer)
-	
+
 	if result["isValid"]:
 		placingMigoSound.play()
 		board = result["board"]
 		render_board()
-		
+
 		if result["winner"] != "":
 			isOver = true
-			
+
 			var igo_cells = MainHelper.getIgoBoard(board, row, col, playedPlayer)
 			mark_igo_cells(igo_cells)
-			
+
 			print(igo_cells)
 			print(result["winner"], " Win!")
 			showWinMenu(result["winner"])
 			return
-		
+
 		currentPlayer = getOpponent(currentPlayer)
 		renderTurnComp()
-		
+
 		if not isOver:
 			isAiThinking = true
 			set_board_input_enabled(false)
-			
+
 			await get_tree().create_timer(0.3).timeout
 			ai_turn()
 	else:
@@ -113,7 +113,7 @@ func ai_turn():
 		isAiThinking = false
 		set_board_input_enabled(false)
 		return
-	
+
 	if currentPlayer != AI_PLAYER:
 		isAiThinking = false
 		set_board_input_enabled(true)
@@ -149,7 +149,7 @@ func ai_turn():
 
 	if result["winner"] != "":
 		isOver = true
-		
+
 		var igo_cells = MainHelper.getIgoBoard(board, move["row"], move["col"], AI_PLAYER)
 		mark_igo_cells(igo_cells)
 		print(result["winner"], " Win!")
@@ -178,9 +178,9 @@ func getMigoCell():
 func showWinMenu(winner):
 	if (winner == "W"):
 		whiteWin.visible = true
-	else: 
+	else:
 		blackWin.visible = true
-	
+
 	backBtn.visible= false
 	boardContainer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	boardGridContainer.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -215,21 +215,21 @@ func init_board_buttons():
 			btn.pressed.connect(_on_cell_pressed.bind(row, col))
 
 			add_child(btn)
-			
+
 func render_board():
 	for row in range(Constants.BOARD_SIZE):
 		for col in range(Constants.BOARD_SIZE):
 
 			var index = row * Constants.BOARD_SIZE + col
 			var btn = get_child(index) as TextureButton
-			
+
 			if (!btn): return
 
 			var cell = board[row][col]
 
 			# reset texture dulu
 			btn.texture_normal = load(CompHelper.getTilesPath(cell))
-		
+
 func mark_igo_cells(igo_cells):
 	for cell in igo_cells:
 		mark_cell(cell['row'], cell['col'])
@@ -237,7 +237,7 @@ func mark_igo_cells(igo_cells):
 func mark_cell(row: int, col: int) -> void:
 	var index = row * Constants.BOARD_SIZE + col
 	var btn = get_child(index) as TextureButton
-	
+
 	if not btn: return
 
 	# Cek apakah button ini sudah punya border panel sebelumnya agar tidak double
@@ -259,16 +259,16 @@ func mark_cell(row: int, col: int) -> void:
 
 	border_panel.add_theme_stylebox_override("panel", style_box)
 	btn.add_child(border_panel)
-	
+
 func clear_igo_marks() -> void:
 	for child in get_children():
 		var btn = child as TextureButton
-		
+
 		if not btn:
 			continue
-		
+
 		var existing_border = btn.get_node_or_null("IgoBorder")
-		
+
 		if existing_border:
 			existing_border.queue_free()
-			
+

@@ -5,7 +5,7 @@ static func evaluateBoard(board, row, col, currentPlayer) -> int:
 	var result = MainHelper.simulateMove(board, row, col, currentPlayer, false)
 	if !result.isValid:
 		return 0
-	
+		
 	var score = AIConstants.SCORE_TILES[row][col]
 	if result.winner == currentPlayer:
 		return score + AIConstants.WIN_SCORE
