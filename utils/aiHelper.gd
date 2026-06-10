@@ -1,6 +1,39 @@
 extends Node
 class_name AiHelper
 
+static func getImmediateYugo(board, currentPlayer) -> Dictionary:
+	for row in range(Constants.BOARD_SIZE):
+		for col in range(Constants.BOARD_SIZE):
+			if board[row][col] != Constants.EMPTY:
+				continue
+
+			var result = MainHelper.simulateMove(
+				board,
+				row,
+				col,
+				currentPlayer,
+				false
+			)
+
+			if !result.isValid:
+				continue
+
+			# Jika setelah move ini currentPlayer langsung menang / Igo
+			if result.winner == currentPlayer:
+				return {
+					"found": true,
+					"row": row,
+					"col": col,
+					"score": AIConstants.WIN_SCORE,
+				}
+
+	return {
+		"found": false,
+		"row": -1,
+		"col": -1,
+		"score": 0,
+	}
+
 static func getPossibleCells(moves, board, AI_PLAYER, HUMAN_PLAYER):
 	var possible_cells = []
 	if (len(moves) < 8):
@@ -91,6 +124,17 @@ static func getTopMoves(moves, board, AI_PLAYER, HUMAN_PLAYER, currentPlayer):
 	return possible_cells.slice(0, AIConstants.TOP_K)
 		
 static func get_best_move_for_ai(board, moves, AI_PLAYER, HUMAN_PLAYER) -> Dictionary:
+	var immediate_win = getImmediateYugo(board, AI_PLAYER)
+
+	if immediate_win["found"]:
+		print("[IMMEDIATE WIN] AI choose row=", immediate_win["row"], " col=", immediate_win["col"])
+
+		return {
+			"row": immediate_win["row"],
+			"col": immediate_win["col"],
+			"score": immediate_win["score"],
+		}
+		
 	var state = {
 		"board": MainHelper.cloneBoard(board),
 		"moves": moves.duplicate(true),

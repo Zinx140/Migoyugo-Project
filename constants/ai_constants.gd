@@ -21,7 +21,7 @@ const CENTER_TILES = [
 
 const MAX_DEPTH = 5;
 const TOP_K = 3;
-const DEBUG_MINIMAX = true
+const DEBUG_MINIMAX = false
 
 const BLOCK_YUGO = 7000
 const DIRECT_YUGO = 7500
