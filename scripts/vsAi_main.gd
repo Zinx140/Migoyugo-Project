@@ -121,8 +121,9 @@ func ai_turn():
 
 	isAiThinking = true
 	set_board_input_enabled(false)
-
-	var move = AiHelper.get_best_move_for_ai(board, AI_PLAYER, HUMAN_PLAYER)
+	
+	var moves = getMigoCell()
+	var move = AiHelper.get_best_move_for_ai(board, moves, AI_PLAYER, HUMAN_PLAYER)
 
 	if move == null or move["row"] == -1 or move["col"] == -1:
 		print("AI tidak punya langkah")
@@ -151,8 +152,6 @@ func ai_turn():
 		
 		var igo_cells = MainHelper.getIgoBoard(board, move["row"], move["col"], AI_PLAYER)
 		mark_igo_cells(igo_cells)
-		
-		print(igo_cells)
 		print(result["winner"], " Win!")
 		showWinMenu(result["winner"])
 		set_board_input_enabled(false)
@@ -163,6 +162,18 @@ func ai_turn():
 
 	isAiThinking = false
 	set_board_input_enabled(true)
+
+func getMigoCell():
+	var ai_moves = []
+	for row in range(Constants.BOARD_SIZE):
+		for col in range(Constants.BOARD_SIZE):
+			if (board[row][col] != Constants.EMPTY):
+				ai_moves.append({
+					"row": row,
+					"col": col
+				})
+				
+	return ai_moves	
 
 func showWinMenu(winner):
 	if (winner == "W"):
@@ -183,7 +194,6 @@ func resetBoard():
 	board = MainHelper.create_empty_board();
 	render_board()
 	
-
 func getOpponent(player):
 	return Constants.BLACK if player == Constants.WHITE else Constants.WHITE
 
