@@ -193,6 +193,7 @@ func resetBoard():
 	clear_igo_marks()
 	board = MainHelper.create_empty_board();
 	render_board()
+	
 
 func getOpponent(player):
 	return Constants.BLACK if player == Constants.WHITE else Constants.WHITE
@@ -259,6 +260,7 @@ func mark_cell(row: int, col: int) -> void:
 
 	border_panel.add_theme_stylebox_override("panel", style_box)
 	btn.add_child(border_panel)
+<<<<<<< HEAD
 
 func clear_igo_marks() -> void:
 	for child in get_children():
@@ -272,3 +274,18 @@ func clear_igo_marks() -> void:
 		if existing_border:
 			existing_border.queue_free()
 
+=======
+	
+func clear_igo_marks() -> void:
+	for child in get_children():
+		var btn = child as TextureButton
+		
+		if not btn:
+			continue
+		
+		var existing_border = btn.get_node_or_null("IgoBorder")
+		
+		if existing_border:
+			existing_border.queue_free()
+			
+>>>>>>> 9a8f4c1a4195b60e3763b3f92ef70ee01d0eed13
