@@ -19,12 +19,6 @@ static func getWegoTokenScore(token: String) -> int:
 
 	return 0
 
-static func clone_board(source_board):
-	var new_board = []
-	for row in source_board:
-		new_board.append(row.duplicate())
-	return new_board
-
 static func getOpponent(player):
 	return Constants.BLACK if player == Constants.WHITE else Constants.WHITE
 

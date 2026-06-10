@@ -1,313 +1,488 @@
 extends Node
 class_name AiHelper
 
-var winner: String = ""
-const DEBUG_MINIMAX := true
-const DEBUG_MAX_PRINT_DEPTH := 10
-
-static var debug_node_count := 0
-
-static func getTopMoves(board, AI_PLAYER, HUMAN_PLAYER, is_player_turn):
-	var moves = []
-	var curr_turn = AI_PLAYER
-	
-	if is_player_turn:
-		curr_turn = HUMAN_PLAYER
-		
+static func getImmediateYugo(board, currentPlayer) -> Dictionary:
 	for row in range(Constants.BOARD_SIZE):
 		for col in range(Constants.BOARD_SIZE):
 			if board[row][col] != Constants.EMPTY:
 				continue
-					
-			if not MainHelper.canPlaceMigo(board, row, col, curr_turn):
+
+			var result = MainHelper.simulateMove(
+				board,
+				row,
+				col,
+				currentPlayer,
+				false
+			)
+
+			if !result.isValid:
 				continue
-			
-			moves.append(HeuristicHelper.evaluateBoard(row, col, board, curr_turn))
-	
-	moves.sort_custom(func(a, b):
-		return a["score"] > b["score"]
-	)
-	
-	return moves.slice(0, Constants.TOP_K)
-	
-static func cloneBoard(source_board):
-	var new_board = []
-	for row in source_board:
-		new_board.append(row.duplicate())
-	return new_board
-	
-static func get_best_move_for_ai(board, AI_PLAYER, HUMAN_PLAYER) -> Dictionary:
-	var immediate_ai_win = findImmediateIgoMove(board, AI_PLAYER)
 
-	if immediate_ai_win.found:
-		print("AI immediate Igo at: ", immediate_ai_win.row, ", ", immediate_ai_win.col)
-		return {
-			"row": immediate_ai_win.row,
-			"col": immediate_ai_win.col,
-		}
+			# Jika setelah move ini currentPlayer langsung menang / Igo
+			if result.winner == currentPlayer:
+				return {
+					"found": true,
+					"row": row,
+					"col": col,
+					"score": AIConstants.WIN_SCORE,
+				}
 
-	var immediate_block = findBlockImmediateIgoMove(board, AI_PLAYER, HUMAN_PLAYER)
-
-	if immediate_block.found:
-		print("AI block immediate Igo at: ", immediate_block.row, ", ", immediate_block.col)
-		return {
-			"row": immediate_block.row,
-			"col": immediate_block.col,
-		}
-		
-	var ai_move = minimax_alphabeta(
-		true,
-		-INF,
-		INF,
-		board,
-		AI_PLAYER,
-		HUMAN_PLAYER,
-		0
-	)
-	
-	var test_result = MainHelper.simulateMove(
-		board,
-		ai_move["row"],
-		ai_move["col"],
-		AI_PLAYER,
-		false
-	)
-	
-	if test_result["isValid"]:
-		return {
-			"row": ai_move["row"],
-			"col": ai_move["col"],
-		}
-	
-	print("Minimax returned invalid move: ", ai_move)
-	
-	var fallback = findFallbackValidMove(board, AI_PLAYER)
-	
-	if fallback["found"]:
-		return {
-			"row": fallback["row"],
-			"col": fallback["col"],
-		}
-	
 	return {
+		"found": false,
 		"row": -1,
 		"col": -1,
+		"score": 0,
+	}
+
+static func isSameCell(cell_a: Dictionary, cell_b: Dictionary) -> bool:
+	return cell_a["row"] == cell_b["row"] and cell_a["col"] == cell_b["col"]
+
+static func hasCell(cells: Array, row: int, col: int) -> bool:
+	for cell in cells:
+		if cell["row"] == row and cell["col"] == col:
+			return true
+
+	return false
+
+static func getPossibleCells(moves, board, AI_PLAYER, HUMAN_PLAYER):
+	var possible_cells = []
+	if (len(moves) < 8):
+		if (board[2][2] == Constants.EMPTY):
+			possible_cells.append({
+				'row': 2,
+				'col': 2,
+			})
+			
+		if (board[5][5] == Constants.EMPTY):
+			possible_cells.append({
+				'row': 5,
+				'col': 5,
+			})
+		
+		if (board[2][5] == Constants.EMPTY):
+			possible_cells.append({
+				'row': 2,
+				'col': 5,
+			})
+		
+		if (board[5][2] == Constants.EMPTY):
+			possible_cells.append({
+				'row': 5,
+				'col': 2,
+			})
+				
+	for move in moves:
+		for dir in Constants.DIRECTIONS:
+			var near_row = move['row'] + dir['dr']
+			var near_col = move['col'] + dir['dc']
+			
+			if (!MainHelper.isInsideBoard(near_row, near_col)):
+				continue
+				
+			if (hasCell(possible_cells, near_row, near_col)):
+				continue
+			
+			if (board[near_row][near_col] == Constants.EMPTY):
+				var ai_result = MainHelper.simulateMove(board, near_row, near_col, AI_PLAYER, false)
+				var human_result = MainHelper.simulateMove(board, near_row, near_col, HUMAN_PLAYER, false)
+				
+				if (ai_result.isValid or human_result.isValid):
+					possible_cells.append({
+						'row': near_row,
+						'col': near_col,
+					})
+				
+	return possible_cells
+		
+static func getTopMoves(moves, board, AI_PLAYER, HUMAN_PLAYER, currentPlayer):
+	var raw_cells = getPossibleCells(moves, board, AI_PLAYER, HUMAN_PLAYER)
+	var possible_cells = []
+	var used_cells = {}
+
+	for cell in raw_cells:
+		var row = cell["row"]
+		var col = cell["col"]
+		var key = str(row) + "-" + str(col)
+
+		if used_cells.has(key):
+			continue
+
+		used_cells[key] = true
+
+		var result = MainHelper.simulateMove(
+			board,
+			row,
+			col,
+			currentPlayer,
+			false
+		)
+
+		if !result.isValid:
+			continue
+
+		cell["score"] = HeuristicHelper.evaluateBoard(
+			board,
+			row,
+			col,
+			currentPlayer
+		)
+
+		possible_cells.append(cell)
+
+	possible_cells.sort_custom(func(a, b):
+		return a["score"] > b["score"]
+	)
+
+	return possible_cells.slice(0, AIConstants.TOP_K)
+		
+static func get_best_move_for_ai(board, moves, AI_PLAYER, HUMAN_PLAYER) -> Dictionary:
+	var immediate_win = getImmediateYugo(board, AI_PLAYER)
+
+	if immediate_win["found"]:
+		print("[IMMEDIATE WIN] AI choose row=", immediate_win["row"], " col=", immediate_win["col"])
+
+		return {
+			"row": immediate_win["row"],
+			"col": immediate_win["col"],
+			"score": immediate_win["score"],
+		}
+		
+	var state = {
+		"board": MainHelper.cloneBoard(board),
+		"moves": moves.duplicate(true),
+		"AI_PLAYER": AI_PLAYER,
+		"HUMAN_PLAYER": HUMAN_PLAYER,
+		"currentPlayer": AI_PLAYER,
+	}
+
+	print("===========================================================")
+	var best_move = minimax(
+		state,
+		AIConstants.MAX_DEPTH,
+		0,
+		-INF,
+		INF,
+		true
+	)
+	print("===========================================================")
+
+	return {
+		"row": best_move["row"],
+		"col": best_move["col"],
+		"score": best_move["score"],
 	}
 	
 static func maxMoves(last_move, new_move) -> Dictionary:
-	if last_move["score"] >= new_move["score"]:
+	if last_move.score >= new_move.score:
 		return last_move
 	return new_move
 
 static func minMoves(last_move, new_move) -> Dictionary:
-	if last_move["score"] <= new_move["score"]:
+	if last_move.score <= new_move.score:
 		return last_move
 	return new_move
 	
-static func minimax_alphabeta(is_maximizing, alpha: float, beta: float, board, AI_PLAYER, HUMAN_PLAYER, depth):
-	if depth >= Constants.MAX_DEPTH or MainHelper.isBoardFull(board):
+static func minimax(
+	state: Dictionary,
+	depth,
+	curr_score,
+	alpha,
+	beta,
+	is_maximizing
+) -> Dictionary:
+
+	var trace_depth = AIConstants.MAX_DEPTH - depth
+	var role = "MAX / AI" if is_maximizing else "MIN / HUMAN"
+
+	trace_log(
+		trace_depth,
+		"[ENTER] depth=" + str(depth) +
+		" role=" + role +
+		" curr_score=" + str(curr_score) +
+		" alpha=" + str(alpha) +
+		" beta=" + str(beta)
+	)
+
+	# Kondisi berhenti
+	if depth == 0:
+		trace_log(
+			trace_depth,
+			"[LEAF] return score=" + str(curr_score)
+		)
+
 		return {
 			"row": -1,
 			"col": -1,
-			"board": board,
-			"score": HeuristicHelper.evaluateBoardState(board, AI_PLAYER, HUMAN_PLAYER),
-			"winner": "",
+			"score": curr_score,
 		}
-	
+
+	var current_player
+	var next_player
+
 	if is_maximizing:
-		var top_moves = getTopMoves(board, AI_PLAYER, HUMAN_PLAYER, false)
-		
-		if top_moves.size() == 0:
-			return {
-				"row": -1,
-				"col": -1,
-				"board": board,
-				"score": HeuristicHelper.evaluateBoardState(board, AI_PLAYER, HUMAN_PLAYER),
-				"winner": "",
-			}
-		
-		var best_val = {
-			"row": -1,
-			"col": -1,
-			"board": board,
-			"score": -INF,
-			"winner": "",
-		}
-		
-		for move in top_moves:
-			var value
-			
-			if move.has("winner") and move["winner"] == AI_PLAYER:
-				value = {
-					"score": AIConstants.WIN_NOW_SCORE,
-				}
-			elif move.has("winner") and move["winner"] == HUMAN_PLAYER:
-				value = {
-					"score": AIConstants.LOSE_NEXT_TURN_SCORE,
-				}
-			else:
-				value = minimax_alphabeta(
-					false,
-					alpha,
-					beta,
-					move["board"],
-					AI_PLAYER,
-					HUMAN_PLAYER,
-					depth + 1
-				)
-			
-			var candidate = {
-				"row": move["row"],
-				"col": move["col"],
-				"board": move["board"],
-				"score": value["score"],
-				"winner": move.get("winner", ""),
-			}
-			
-			best_val = maxMoves(best_val, candidate)
-			alpha = max(alpha, best_val["score"])
-			
-			print('==================================')
-			print('Move: ', best_val['row'], ' - ', best_val['col'])
-			if beta <= alpha:
-				print("max prunned: ", best_val["score"])
-				break
-			else: 
-				print("max: ", best_val["score"])
-				
-			print('==================================')
-		
-		return best_val
-	
+		current_player = state["AI_PLAYER"]
+		next_player = state["HUMAN_PLAYER"]
 	else:
-		var top_moves = getTopMoves(board, AI_PLAYER, HUMAN_PLAYER, true)
-		
-		if top_moves.size() == 0:
-			return {
-				"row": -1,
-				"col": -1,
-				"board": board,
-				"score": HeuristicHelper.evaluateBoardState(board, AI_PLAYER, HUMAN_PLAYER),
-				"winner": "",
-			}
-		
-		var best_val = {
+		current_player = state["HUMAN_PLAYER"]
+		next_player = state["AI_PLAYER"]
+
+	var top_moves = getTopMoves(
+		state["moves"],
+		state["board"],
+		state["AI_PLAYER"],
+		state["HUMAN_PLAYER"],
+		current_player
+	)
+
+	trace_log(
+		trace_depth,
+		"[MOVES] player=" + str(current_player) +
+		" total_top_moves=" + str(len(top_moves))
+	)
+
+	# Jika tidak ada move yang bisa dipilih
+	if len(top_moves) == 0:
+		trace_log(
+			trace_depth,
+			"[NO MOVE] return score=" + str(curr_score)
+		)
+
+		return {
 			"row": -1,
 			"col": -1,
-			"board": board,
-			"score": INF,
-			"winner": "",
+			"score": curr_score,
 		}
-		
+
+	# Giliran AI / MAX
+	if is_maximizing:
+		var best_move = {
+			"row": -1,
+			"col": -1,
+			"score": -INF,
+		}
+
 		for move in top_moves:
-			var value
-			
-			if move.has("winner") and move["winner"] == AI_PLAYER:
-				value = {
-					"score": AIConstants.WIN_NOW_SCORE,
-				}
-			elif move.has("winner") and move["winner"] == HUMAN_PLAYER:
-				value = {
-					"score": AIConstants.LOSE_NEXT_TURN_SCORE,
-				}
-			else:
-				value = minimax_alphabeta(
-					true,
-					alpha,
-					beta,
-					move["board"],
-					AI_PLAYER,
-					HUMAN_PLAYER,
-					depth + 1
+			trace_log(
+				trace_depth,
+				"[TRY MAX] move=(" + str(move["row"]) + "," + str(move["col"]) + ")" +
+				" move_score=" + str(move["score"])
+			)
+
+			var result = MainHelper.simulateMove(
+				state["board"],
+				move["row"],
+				move["col"],
+				current_player,
+				false
+			)
+
+			if !result.isValid:
+				trace_log(
+					trace_depth,
+					"[SKIP MAX] invalid move=(" + str(move["row"]) + "," + str(move["col"]) + ")" +
+					" message=" + str(result["message"])
 				)
-			
-			var candidate = {
+				continue
+
+			var new_moves = state["moves"].duplicate(true)
+			new_moves.append({
 				"row": move["row"],
 				"col": move["col"],
-				"board": move["board"],
-				"score": value["score"],
-				"winner": move.get("winner", ""),
+				"player": current_player,
+			})
+
+			# Karena AI bergerak, score ditambah
+			var new_score = curr_score + move["score"]
+
+			trace_log(
+				trace_depth,
+				"[SCORE MAX] old=" + str(curr_score) +
+				" + move_score=" + str(move["score"]) +
+				" => new_score=" + str(new_score)
+			)
+
+			var new_state = {
+				"board": result["board"],
+				"moves": new_moves,
+				"AI_PLAYER": state["AI_PLAYER"],
+				"HUMAN_PLAYER": state["HUMAN_PLAYER"],
+				"currentPlayer": next_player,
 			}
-			
-			best_val = minMoves(best_val, candidate)
-			beta = min(beta, best_val["score"])
-			
-			print('==================================')
-			print('Move: ', best_val['row'], ' - ', best_val['col'])
+
+			var result_move = minimax(
+				new_state,
+				depth - 1,
+				new_score,
+				alpha,
+				beta,
+				false
+			)
+
+			var candidate_move = {
+				"row": move["row"],
+				"col": move["col"],
+				"score": result_move["score"],
+			}
+
+			trace_log(
+				trace_depth,
+				"[RESULT MAX] move=(" + str(move["row"]) + "," + str(move["col"]) + ")" +
+				" result_score=" + str(result_move["score"]) +
+				" current_best=" + str(best_move["score"])
+			)
+
+			best_move = maxMoves(best_move, candidate_move)
+
+			trace_log(
+				trace_depth,
+				"[BEST MAX] best_move=(" + str(best_move["row"]) + "," + str(best_move["col"]) + ")" +
+				" best_score=" + str(best_move["score"])
+			)
+
+			alpha = max(alpha, best_move["score"])
+
+			trace_log(
+				trace_depth,
+				"[ALPHA UPDATE] alpha=" + str(alpha) +
+				" beta=" + str(beta)
+			)
+
 			if beta <= alpha:
-				print("min prunned: ", best_val["score"])
+				trace_log(
+					trace_depth,
+					"[PRUNE MAX] beta <= alpha | beta=" + str(beta) +
+					" alpha=" + str(alpha)
+				)
 				break
-			else:
-				print("min: ", best_val["score"])
-			print('==================================')
-		
-		return best_val
-		
-static func findImmediateIgoMove(board, player) -> Dictionary:
-	for row in range(Constants.BOARD_SIZE):
-		for col in range(Constants.BOARD_SIZE):
-			if board[row][col] != Constants.EMPTY:
+
+		trace_log(
+			trace_depth,
+			"[RETURN MAX] move=(" + str(best_move["row"]) + "," + str(best_move["col"]) + ")" +
+			" score=" + str(best_move["score"])
+		)
+
+		return best_move
+
+	# Giliran Human / MIN
+	else:
+		var best_move = {
+			"row": -1,
+			"col": -1,
+			"score": INF,
+		}
+
+		for move in top_moves:
+			trace_log(
+				trace_depth,
+				"[TRY MIN] move=(" + str(move["row"]) + "," + str(move["col"]) + ")" +
+				" move_score=" + str(move["score"])
+			)
+
+			var result = MainHelper.simulateMove(
+				state["board"],
+				move["row"],
+				move["col"],
+				current_player,
+				false
+			)
+
+			if !result.isValid:
+				trace_log(
+					trace_depth,
+					"[SKIP MIN] invalid move=(" + str(move["row"]) + "," + str(move["col"]) + ")" +
+					" message=" + str(result["message"])
+				)
 				continue
 
-			var result = MainHelper.simulateMove(board, row, col, player, false)
+			var new_moves = state["moves"].duplicate(true)
+			new_moves.append({
+				"row": move["row"],
+				"col": move["col"],
+				"player": current_player,
+			})
 
-			if result.isValid and result.winner == player:
-				return {
-					"found": true,
-					"row": row,
-					"col": col,
-					"board": result.board,
-					"score": AIConstants.WIN_NOW_SCORE,
-				}
+			# Karena Human bergerak, score AI dikurangi
+			var new_score = curr_score - move["score"]
 
-	return {
-		"found": false,
-	}
+			trace_log(
+				trace_depth,
+				"[SCORE MIN] old=" + str(curr_score) +
+				" - move_score=" + str(move["score"]) +
+				" => new_score=" + str(new_score)
+			)
 
-static func findBlockImmediateIgoMove(board, AI_PLAYER, HUMAN_PLAYER) -> Dictionary:
-	for row in range(Constants.BOARD_SIZE):
-		for col in range(Constants.BOARD_SIZE):
-			if board[row][col] != Constants.EMPTY:
-				continue
+			var new_state = {
+				"board": result["board"],
+				"moves": new_moves,
+				"AI_PLAYER": state["AI_PLAYER"],
+				"HUMAN_PLAYER": state["HUMAN_PLAYER"],
+				"currentPlayer": next_player,
+			}
 
-			var human_result = MainHelper.simulateMove(board, row, col, HUMAN_PLAYER, false)
+			var result_move = minimax(
+				new_state,
+				depth - 1,
+				new_score,
+				alpha,
+				beta,
+				true
+			)
 
-			if not human_result.isValid:
-				continue
+			var candidate_move = {
+				"row": move["row"],
+				"col": move["col"],
+				"score": result_move["score"],
+			}
 
-			if human_result.winner != HUMAN_PLAYER:
-				continue
+			trace_log(
+				trace_depth,
+				"[RESULT MIN] move=(" + str(move["row"]) + "," + str(move["col"]) + ")" +
+				" result_score=" + str(result_move["score"]) +
+				" current_best=" + str(best_move["score"])
+			)
 
-			var ai_block_result = MainHelper.simulateMove(board, row, col, AI_PLAYER, false)
+			best_move = minMoves(best_move, candidate_move)
 
-			if ai_block_result.isValid:
-				return {
-					"found": true,
-					"row": row,
-					"col": col,
-					"board": ai_block_result.board,
-					"score": 950_000_000,
-				}
+			trace_log(
+				trace_depth,
+				"[BEST MIN] best_move=(" + str(best_move["row"]) + "," + str(best_move["col"]) + ")" +
+				" best_score=" + str(best_move["score"])
+			)
 
-	return {
-		"found": false,
-	}
+			beta = min(beta, best_move["score"])
 
-static func findFallbackValidMove(board, AI_PLAYER) -> Dictionary:
-	for row in range(Constants.BOARD_SIZE):
-		for col in range(Constants.BOARD_SIZE):
-			if board[row][col] != Constants.EMPTY:
-				continue
+			trace_log(
+				trace_depth,
+				"[BETA UPDATE] alpha=" + str(alpha) +
+				" beta=" + str(beta)
+			)
+
+			if beta <= alpha:
+				trace_log(
+					trace_depth,
+					"[PRUNE MIN] beta <= alpha | beta=" + str(beta) +
+					" alpha=" + str(alpha)
+				)
+				break
+
+		trace_log(
+			trace_depth,
+			"[RETURN MIN] move=(" + str(best_move["row"]) + "," + str(best_move["col"]) + ")" +
+			" score=" + str(best_move["score"])
+		)
+
+		return best_move
 			
-			var result = MainHelper.simulateMove(board, row, col, AI_PLAYER, false)
-			
-			if result["isValid"]:
-				return {
-					"found": true,
-					"row": row,
-					"col": col,
-				}
+# tracing helper
+static func trace_indent(depth) -> String:
+	var text = ""
+	for i in range(depth):
+		text += "  "
+	return text
 	
-	return {
-		"found": false,
-	}
+static func trace_log(depth, message: String) -> void:
+	if !AIConstants.DEBUG_MINIMAX:
+		return
+
+	print(trace_indent(depth) + message)
+		

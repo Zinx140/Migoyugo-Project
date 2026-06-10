@@ -16,8 +16,6 @@ const EMPTY = "";
 const AI_ENABLED = false;
 const HUMAN_PLAYER = WHITE;
 const AI_PLAYER = BLACK;
-const MAX_DEPTH = 5;
-const TOP_K = 3;
 
 const BLACK_MIGO = "res://assets/imgs/black_migo.png"
 const WHITE_MIGO = "res://assets/imgs/white_migo.png"

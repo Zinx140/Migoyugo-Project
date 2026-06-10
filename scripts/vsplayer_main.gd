@@ -24,7 +24,7 @@ func _ready() -> void:
 func renderTurnComp():
 	if currentPlayer == Constants.WHITE:
 		whiteTurnComp.visible = true
-		blackTurnComp.visible = false		
+		blackTurnComp.visible = false
 	else:
 		whiteTurnComp.visible = false
 		blackTurnComp.visible = true
@@ -32,26 +32,26 @@ func renderTurnComp():
 func _on_cell_pressed(row, col):
 	if isOver:
 		return
-	
+
 	var playedPlayer = currentPlayer
 	var result = MainHelper.makeMove(board, row, col, playedPlayer)
-	
+
 	if result["isValid"]:
 		placingMigoSound.play()
 		board = result["board"]
 		render_board()
-		
+
 		if result["winner"] != "":
 			isOver = true
-			
+
 			var igo_cells = MainHelper.getIgoBoard(board, row, col, playedPlayer)
 			mark_igo_cells(igo_cells)
-			
+
 			print(igo_cells)
 			print(result["winner"], " Win!")
 			showWinMenu(result["winner"])
 			return
-		
+
 		currentPlayer = getOpponent(currentPlayer)
 		renderTurnComp()
 	else:
@@ -60,9 +60,9 @@ func _on_cell_pressed(row, col):
 func showWinMenu(winner):
 	if (winner == "W"):
 		whiteWin.visible = true
-	else: 
+	else:
 		blackWin.visible = true
-	
+
 	backBtn.visible= false
 	boardContainer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	boardGridContainer.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -72,6 +72,7 @@ func showWinMenu(winner):
 	exitBtn.visible = true
 
 func resetBoard():
+	clear_igo_marks()
 	board = MainHelper.create_empty_board();
 	render_board()
 
@@ -96,14 +97,14 @@ func init_board_buttons():
 			btn.pressed.connect(_on_cell_pressed.bind(row, col))
 
 			add_child(btn)
-			
+
 func render_board():
 	for row in range(Constants.BOARD_SIZE):
 		for col in range(Constants.BOARD_SIZE):
 
 			var index = row * Constants.BOARD_SIZE + col
 			var btn = get_child(index) as TextureButton
-			
+
 			if (!btn): return
 
 			var cell = board[row][col]
@@ -118,7 +119,7 @@ func mark_igo_cells(igo_cells):
 func mark_cell(row: int, col: int) -> void:
 	var index = row * Constants.BOARD_SIZE + col
 	var btn = get_child(index) as TextureButton
-	
+
 	if not btn: return
 
 	# Cek apakah button ini sudah punya border panel sebelumnya agar tidak double
@@ -140,3 +141,15 @@ func mark_cell(row: int, col: int) -> void:
 
 	border_panel.add_theme_stylebox_override("panel", style_box)
 	btn.add_child(border_panel)
+
+func clear_igo_marks() -> void:
+	for child in get_children():
+		var btn = child as TextureButton
+
+		if not btn:
+			continue
+
+		var existing_border = btn.get_node_or_null("IgoBorder")
+
+		if existing_border:
+			existing_border.queue_free()

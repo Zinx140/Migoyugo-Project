@@ -1,0 +1,817 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Minimax Tree Generator</title>
+
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f4f6f8;
+        color: #222;
+      }
+
+      .app {
+        width: 100%;
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      h1 {
+        margin-top: 0;
+        margin-bottom: 8px;
+        font-size: 24px;
+      }
+
+      .description {
+        margin-bottom: 16px;
+        color: #555;
+      }
+
+      .panel {
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        padding: 16px;
+        margin-bottom: 16px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      }
+
+      textarea {
+        width: 100%;
+        height: 280px;
+        resize: vertical;
+        padding: 12px;
+        font-family: Consolas, monospace;
+        font-size: 13px;
+        line-height: 1.4;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        outline: none;
+      }
+
+      textarea:focus {
+        border-color: #2f80ed;
+      }
+
+      .button-group {
+        margin-top: 12px;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      button {
+        border: none;
+        padding: 10px 16px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: bold;
+      }
+
+      .btn-primary {
+        background: #2f80ed;
+        color: white;
+      }
+
+      .btn-secondary {
+        background: #e0e0e0;
+        color: #222;
+      }
+
+      .btn-danger {
+        background: #eb5757;
+        color: white;
+      }
+
+      .canvas-wrapper {
+        width: 100%;
+        height: 650px;
+        overflow: auto;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        background: #ffffff;
+        position: relative;
+      }
+
+      canvas {
+        display: block;
+        background: #ffffff;
+      }
+
+      .legend {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-top: 12px;
+        font-size: 14px;
+      }
+
+      .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .box {
+        width: 18px;
+        height: 18px;
+        border-radius: 4px;
+        border: 1px solid #aaa;
+      }
+
+      .max-box {
+        background: #d7ecff;
+      }
+
+      .min-box {
+        background: #ffe6c7;
+      }
+
+      .leaf-box {
+        background: #dff6dd;
+      }
+
+      .pruned-box {
+        background: #f8d7da;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="app">
+      <h1>Minimax Tree Generator</h1>
+      <div class="description">
+        Paste log Minimax Alpha-Beta Pruning, lalu klik Generate Tree.
+      </div>
+
+      <div class="panel">
+        <textarea
+          id="logInput"
+          placeholder="Paste log minimax di sini..."
+        ></textarea>
+
+        <div class="button-group">
+          <button class="btn-primary" onclick="generateTree()">
+            Generate Tree
+          </button>
+          <button class="btn-secondary" onclick="loadExample()">
+            Load Example
+          </button>
+          <button class="btn-secondary" onclick="downloadCanvas()">
+            Download PNG
+          </button>
+          <button class="btn-danger" onclick="clearAll()">Clear</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="canvas-wrapper">
+          <canvas id="treeCanvas"></canvas>
+        </div>
+
+        <div class="legend">
+          <div class="legend-item">
+            <div class="box max-box"></div>
+            MAX / AI
+          </div>
+          <div class="legend-item">
+            <div class="box min-box"></div>
+            MIN / HUMAN
+          </div>
+          <div class="legend-item">
+            <div class="box leaf-box"></div>
+            Leaf
+          </div>
+          <div class="legend-item">
+            <div class="box pruned-box"></div>
+            Pruned Branch
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const NODE_WIDTH = 170;
+      const NODE_HEIGHT = 95;
+      const H_GAP = 55;
+      const V_GAP = 140;
+      const ROOT_GAP = 120;
+      const MARGIN = 70;
+
+      let canvas = document.getElementById("treeCanvas");
+      let ctx = canvas.getContext("2d");
+
+      function countIndentLevel(line) {
+        const match = line.match(/^ */);
+        const spaces = match ? match[0].length : 0;
+        return Math.floor(spaces / 2);
+      }
+
+      function parseValue(line, key) {
+        const regex = new RegExp(key + "=([^\\s]+)");
+        const match = line.match(regex);
+        return match ? match[1] : "";
+      }
+
+      function parseMove(line) {
+        const match = line.match(/move=\((\-?\d+),(\-?\d+)\)/);
+        if (!match) return null;
+
+        return {
+          row: parseInt(match[1]),
+          col: parseInt(match[2]),
+        };
+      }
+
+      function parseBestMove(line) {
+        const match = line.match(/best_move=\((\-?\d+),(\-?\d+)\)/);
+        if (!match) return null;
+
+        return {
+          row: parseInt(match[1]),
+          col: parseInt(match[2]),
+        };
+      }
+
+      function parseMoveScore(line) {
+        const match = line.match(/move_score=([^\s]+)/);
+        return match ? match[1] : "";
+      }
+
+      function parseReturnScore(line) {
+        const match = line.match(/score=([^\s]+)/);
+        return match ? match[1] : "";
+      }
+
+      function parseBestScore(line) {
+        const match = line.match(/best_score=([^\s]+)/);
+        return match ? match[1] : "";
+      }
+
+      function parseLeafScore(line) {
+        const match = line.match(/return score=([^\s]+)/);
+        return match ? match[1] : "";
+      }
+
+      function createNodeFromEnter(line, level) {
+        const roleMatch = line.match(/role=(.*?)\s+curr_score=/);
+        const roleText = roleMatch ? roleMatch[1] : "UNKNOWN";
+
+        let type = "NODE";
+        if (roleText.includes("MAX")) type = "MAX";
+        if (roleText.includes("MIN")) type = "MIN";
+
+        return {
+          id: crypto.randomUUID ? crypto.randomUUID() : String(Math.random()),
+          type: type,
+          roleText: roleText,
+          level: level,
+          depth: parseValue(line, "depth"),
+          currScore: parseValue(line, "curr_score"),
+          alpha: parseValue(line, "alpha"),
+          beta: parseValue(line, "beta"),
+
+          move: null,
+          moveScore: null,
+          edgeLabel: "",
+
+          returnScore: null,
+          bestMove: null,
+          bestScore: null,
+          leafScore: null,
+
+          isPruned: false,
+          pruneAlpha: null,
+          pruneBeta: null,
+
+          children: [],
+          x: 0,
+          y: 0,
+        };
+      }
+
+      function createPrunedNode(line, level) {
+        const betaMatch = line.match(/beta=([^\s]+)/);
+        const alphaMatch = line.match(/alpha=([^\s]+)/);
+
+        return {
+          id: crypto.randomUUID ? crypto.randomUUID() : String(Math.random()),
+          type: "PRUNED",
+          roleText: "PRUNED",
+          level: level,
+          depth: "",
+          currScore: "",
+          alpha: alphaMatch ? alphaMatch[1] : "",
+          beta: betaMatch ? betaMatch[1] : "",
+
+          move: null,
+          moveScore: null,
+          edgeLabel: "pruned",
+
+          returnScore: null,
+          bestMove: null,
+          bestScore: null,
+          leafScore: null,
+
+          isPruned: true,
+          children: [],
+          x: 0,
+          y: 0,
+        };
+      }
+
+      function parseLogToTree(logText) {
+        const lines = logText
+          .split("\n")
+          .map((line) => line.replace(/\r/g, ""))
+          .filter((line) => line.trim() !== "");
+
+        const roots = [];
+        const stack = [];
+        const pendingTry = {};
+
+        for (const rawLine of lines) {
+          const line = rawLine;
+          const trimmed = line.trim();
+          const level = countIndentLevel(line);
+
+          if (trimmed.startsWith("[ENTER]")) {
+            const node = createNodeFromEnter(trimmed, level);
+
+            if (level === 0) {
+              roots.push(node);
+            } else {
+              const parent = stack[level - 1];
+
+              if (parent) {
+                const pending = pendingTry[level - 1];
+
+                if (pending) {
+                  node.move = pending.move;
+                  node.moveScore = pending.moveScore;
+                  node.edgeLabel = pending.edgeLabel;
+                }
+
+                parent.children.push(node);
+              }
+            }
+
+            stack[level] = node;
+            stack.length = level + 1;
+          } else if (trimmed.startsWith("[TRY")) {
+            const move = parseMove(trimmed);
+            const moveScore = parseMoveScore(trimmed);
+
+            pendingTry[level] = {
+              move: move,
+              moveScore: moveScore,
+              edgeLabel: move
+                ? "move (" + move.row + "," + move.col + ")"
+                : "move",
+            };
+          } else if (trimmed.startsWith("[LEAF]")) {
+            const currentNode = stack[level];
+
+            if (currentNode) {
+              const score = parseLeafScore(trimmed);
+              currentNode.leafScore = score;
+              currentNode.returnScore = score;
+            }
+          } else if (trimmed.startsWith("[RETURN")) {
+            const currentNode = stack[level];
+
+            if (currentNode) {
+              const move = parseMove(trimmed);
+              const score = parseReturnScore(trimmed);
+
+              currentNode.returnScore = score;
+
+              if (move) {
+                currentNode.bestMove = move;
+              }
+            }
+          } else if (trimmed.startsWith("[BEST")) {
+            const currentNode = stack[level];
+
+            if (currentNode) {
+              const bestMove = parseBestMove(trimmed);
+              const bestScore = parseBestScore(trimmed);
+
+              currentNode.bestMove = bestMove;
+              currentNode.bestScore = bestScore;
+            }
+          } else if (trimmed.startsWith("[PRUNE")) {
+            const currentNode = stack[level];
+
+            if (currentNode) {
+              const prunedNode = createPrunedNode(trimmed, level + 1);
+              currentNode.children.push(prunedNode);
+            }
+          }
+        }
+
+        return roots;
+      }
+
+      function layoutTrees(roots) {
+        let nextX = MARGIN;
+        let maxY = 0;
+
+        function layoutNode(node, visualLevel) {
+          node.y = MARGIN + visualLevel * V_GAP;
+          maxY = Math.max(maxY, node.y);
+
+          if (!node.children || node.children.length === 0) {
+            node.x = nextX;
+            nextX += NODE_WIDTH + H_GAP;
+            return;
+          }
+
+          for (const child of node.children) {
+            layoutNode(child, visualLevel + 1);
+          }
+
+          const firstChild = node.children[0];
+          const lastChild = node.children[node.children.length - 1];
+
+          node.x = (firstChild.x + lastChild.x) / 2;
+        }
+
+        for (const root of roots) {
+          layoutNode(root, 0);
+          nextX += ROOT_GAP;
+        }
+
+        return {
+          width: Math.max(nextX + MARGIN, 1200),
+          height: Math.max(maxY + NODE_HEIGHT + MARGIN, 700),
+        };
+      }
+
+      function roundedRect(ctx, x, y, width, height, radius) {
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.lineTo(x + width - radius, y);
+        ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+        ctx.lineTo(x + width, y + height - radius);
+        ctx.quadraticCurveTo(
+          x + width,
+          y + height,
+          x + width - radius,
+          y + height,
+        );
+        ctx.lineTo(x + radius, y + height);
+        ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+        ctx.lineTo(x, y + radius);
+        ctx.quadraticCurveTo(x, y, x + radius, y);
+        ctx.closePath();
+      }
+
+      function getNodeColor(node) {
+        if (node.type === "MAX") return "#d7ecff";
+        if (node.type === "MIN") return "#ffe6c7";
+        if (node.type === "PRUNED") return "#f8d7da";
+        if (node.leafScore !== null) return "#dff6dd";
+        return "#eeeeee";
+      }
+
+      function getNodeBorderColor(node) {
+        if (node.type === "MAX") return "#2f80ed";
+        if (node.type === "MIN") return "#f2994a";
+        if (node.type === "PRUNED") return "#eb5757";
+        if (node.leafScore !== null) return "#27ae60";
+        return "#999999";
+      }
+
+      function drawMultilineText(lines, x, y, lineHeight, align = "center") {
+        ctx.textAlign = align;
+        ctx.textBaseline = "top";
+
+        for (let i = 0; i < lines.length; i++) {
+          ctx.fillText(lines[i], x, y + i * lineHeight);
+        }
+      }
+
+      function drawEdge(parent, child) {
+        const startX = parent.x + NODE_WIDTH / 2;
+        const startY = parent.y + NODE_HEIGHT;
+        const endX = child.x + NODE_WIDTH / 2;
+        const endY = child.y;
+
+        ctx.save();
+
+        if (child.type === "PRUNED") {
+          ctx.setLineDash([8, 6]);
+          ctx.strokeStyle = "#eb5757";
+        } else {
+          ctx.setLineDash([]);
+          ctx.strokeStyle = "#777";
+        }
+
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(startX, startY);
+
+        const midY = (startY + endY) / 2;
+        ctx.bezierCurveTo(startX, midY, endX, midY, endX, endY);
+
+        ctx.stroke();
+        ctx.restore();
+
+        const labelX = (startX + endX) / 2;
+        const labelY = (startY + endY) / 2 - 12;
+
+        ctx.save();
+        ctx.fillStyle = "#ffffff";
+        ctx.strokeStyle = "#cccccc";
+
+        const label = child.edgeLabel || "";
+        if (label !== "") {
+          ctx.font = "12px Arial";
+          const textWidth = ctx.measureText(label).width + 12;
+
+          ctx.beginPath();
+          ctx.roundRect
+            ? ctx.roundRect(
+                labelX - textWidth / 2,
+                labelY - 4,
+                textWidth,
+                22,
+                6,
+              )
+            : roundedRect(
+                ctx,
+                labelX - textWidth / 2,
+                labelY - 4,
+                textWidth,
+                22,
+                6,
+              );
+
+          ctx.fill();
+          ctx.stroke();
+
+          ctx.fillStyle = child.type === "PRUNED" ? "#eb5757" : "#333";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(label, labelX, labelY + 7);
+        }
+
+        ctx.restore();
+      }
+
+      function drawNode(node) {
+        const x = node.x;
+        const y = node.y;
+
+        ctx.save();
+
+        ctx.fillStyle = getNodeColor(node);
+        ctx.strokeStyle = getNodeBorderColor(node);
+        ctx.lineWidth = 2;
+
+        if (node.type === "PRUNED") {
+          ctx.setLineDash([6, 4]);
+        } else {
+          ctx.setLineDash([]);
+        }
+
+        roundedRect(ctx, x, y, NODE_WIDTH, NODE_HEIGHT, 12);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.setLineDash([]);
+        ctx.fillStyle = "#222";
+
+        let lines = [];
+
+        if (node.type === "PRUNED") {
+          lines.push("PRUNED");
+          lines.push("β <= α");
+          lines.push("α=" + node.alpha + ", β=" + node.beta);
+        } else if (node.leafScore !== null) {
+          lines.push("LEAF");
+          lines.push("score = " + node.leafScore);
+          lines.push("α=" + node.alpha + ", β=" + node.beta);
+        } else {
+          lines.push(node.type + " node");
+
+          if (node.move) {
+            lines.push("move=(" + node.move.row + "," + node.move.col + ")");
+          }
+
+          lines.push("curr=" + node.currScore);
+
+          if (node.returnScore !== null) {
+            lines.push("return=" + node.returnScore);
+          }
+
+          if (node.bestMove) {
+            lines.push(
+              "best=(" + node.bestMove.row + "," + node.bestMove.col + ")",
+            );
+          }
+
+          lines.push("α=" + node.alpha + ", β=" + node.beta);
+        }
+
+        ctx.font = "bold 13px Arial";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "top";
+
+        const centerX = x + NODE_WIDTH / 2;
+        let textY = y + 10;
+
+        for (let i = 0; i < lines.length; i++) {
+          if (i === 0) {
+            ctx.font = "bold 13px Arial";
+          } else {
+            ctx.font = "12px Arial";
+          }
+
+          ctx.fillText(lines[i], centerX, textY);
+          textY += 15;
+        }
+
+        ctx.restore();
+      }
+
+      function drawTree(roots) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.save();
+
+        ctx.font = "bold 24px Arial";
+        ctx.fillStyle = "#222";
+        ctx.textAlign = "left";
+        ctx.fillText("Minimax Tree - Alpha Beta Pruning", 30, 28);
+
+        ctx.font = "14px Arial";
+        ctx.fillStyle = "#555";
+        ctx.fillText("Generated from console log", 30, 52);
+
+        ctx.restore();
+
+        function drawEdgesRecursive(node) {
+          for (const child of node.children) {
+            drawEdge(node, child);
+            drawEdgesRecursive(child);
+          }
+        }
+
+        function drawNodesRecursive(node) {
+          drawNode(node);
+
+          for (const child of node.children) {
+            drawNodesRecursive(child);
+          }
+        }
+
+        for (const root of roots) {
+          drawEdgesRecursive(root);
+        }
+
+        for (const root of roots) {
+          drawNodesRecursive(root);
+        }
+      }
+
+      function generateTree() {
+        const logText = document.getElementById("logInput").value;
+
+        if (logText.trim() === "") {
+          alert("Masukkan log minimax terlebih dahulu.");
+          return;
+        }
+
+        const roots = parseLogToTree(logText);
+
+        if (roots.length === 0) {
+          alert("Log tidak terbaca. Pastikan ada baris [ENTER].");
+          return;
+        }
+
+        const size = layoutTrees(roots);
+
+        canvas.width = size.width;
+        canvas.height = size.height;
+
+        drawTree(roots);
+      }
+
+      function clearAll() {
+        document.getElementById("logInput").value = "";
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        canvas.width = 1200;
+        canvas.height = 700;
+      }
+
+      function downloadCanvas() {
+        const link = document.createElement("a");
+        link.download = "minimax-tree.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      }
+
+      function loadExample() {
+        document.getElementById("logInput").value =
+          `[ENTER] depth=3 role=MAX / AI curr_score=1 alpha=-inf beta=inf
+[MOVES] player=W total_top_moves=2
+[TRY MAX] move=(3,6) move_score=0
+[SCORE MAX] old=1 + move_score=0 => new_score=1
+  [ENTER] depth=2 role=MIN / HUMAN curr_score=1 alpha=-inf beta=inf
+  [MOVES] player=B total_top_moves=2
+  [TRY MIN] move=(4,7) move_score=0
+  [SCORE MIN] old=1 - move_score=0 => new_score=1
+    [ENTER] depth=1 role=MAX / AI curr_score=1 alpha=-inf beta=inf
+    [MOVES] player=W total_top_moves=2
+    [TRY MAX] move=(5,6) move_score=0
+    [SCORE MAX] old=1 + move_score=0 => new_score=1
+      [ENTER] depth=0 role=MIN / HUMAN curr_score=1 alpha=-inf beta=inf
+      [LEAF] return score=1
+    [RESULT MAX] move=(5,6) result_score=1 current_best=-inf
+    [BEST MAX] best_move=(5,6) best_score=1
+    [ALPHA UPDATE] alpha=1 beta=inf
+    [TRY MAX] move=(4,6) move_score=0
+    [SCORE MAX] old=1 + move_score=0 => new_score=1
+      [ENTER] depth=0 role=MIN / HUMAN curr_score=1 alpha=1 beta=inf
+      [LEAF] return score=1
+    [RESULT MAX] move=(4,6) result_score=1 current_best=1
+    [BEST MAX] best_move=(5,6) best_score=1
+    [ALPHA UPDATE] alpha=1 beta=inf
+    [RETURN MAX] move=(5,6) score=1
+  [RESULT MIN] move=(4,7) result_score=1 current_best=inf
+  [BEST MIN] best_move=(4,7) best_score=1
+  [BETA UPDATE] alpha=-inf beta=1
+  [TRY MIN] move=(4,5) move_score=0
+  [SCORE MIN] old=1 - move_score=0 => new_score=1
+    [ENTER] depth=1 role=MAX / AI curr_score=1 alpha=-inf beta=1
+    [MOVES] player=W total_top_moves=2
+    [TRY MAX] move=(5,6) move_score=0
+    [SCORE MAX] old=1 + move_score=0 => new_score=1
+      [ENTER] depth=0 role=MIN / HUMAN curr_score=1 alpha=-inf beta=1
+      [LEAF] return score=1
+    [RESULT MAX] move=(5,6) result_score=1 current_best=-inf
+    [BEST MAX] best_move=(5,6) best_score=1
+    [ALPHA UPDATE] alpha=1 beta=1
+    [PRUNE MAX] beta <= alpha | beta=1 alpha=1
+    [RETURN MAX] move=(5,6) score=1
+  [RESULT MIN] move=(4,5) result_score=1 current_best=1
+  [BEST MIN] best_move=(4,7) best_score=1
+  [BETA UPDATE] alpha=-inf beta=1
+  [RETURN MIN] move=(4,7) score=1
+[RESULT MAX] move=(3,6) result_score=1 current_best=-inf
+[BEST MAX] best_move=(3,6) best_score=1
+[ALPHA UPDATE] alpha=1 beta=inf
+[TRY MAX] move=(3,4) move_score=0
+[SCORE MAX] old=1 + move_score=0 => new_score=1
+  [ENTER] depth=2 role=MIN / HUMAN curr_score=1 alpha=1 beta=inf
+  [MOVES] player=B total_top_moves=2
+  [TRY MIN] move=(4,5) move_score=0
+  [SCORE MIN] old=1 - move_score=0 => new_score=1
+    [ENTER] depth=1 role=MAX / AI curr_score=1 alpha=1 beta=inf
+    [MOVES] player=W total_top_moves=2
+    [TRY MAX] move=(5,6) move_score=0
+    [SCORE MAX] old=1 + move_score=0 => new_score=1
+      [ENTER] depth=0 role=MIN / HUMAN curr_score=1 alpha=1 beta=inf
+      [LEAF] return score=1
+    [RESULT MAX] move=(5,6) result_score=1 current_best=-inf
+    [BEST MAX] best_move=(5,6) best_score=1
+    [ALPHA UPDATE] alpha=1 beta=inf
+    [TRY MAX] move=(5,4) move_score=0
+    [SCORE MAX] old=1 + move_score=0 => new_score=1
+      [ENTER] depth=0 role=MIN / HUMAN curr_score=1 alpha=1 beta=inf
+      [LEAF] return score=1
+    [RESULT MAX] move=(5,4) result_score=1 current_best=1
+    [BEST MAX] best_move=(5,6) best_score=1
+    [ALPHA UPDATE] alpha=1 beta=inf
+    [RETURN MAX] move=(5,6) score=1
+  [RESULT MIN] move=(4,5) result_score=1 current_best=inf
+  [BEST MIN] best_move=(4,5) best_sc    ore=1
+  [BETA UPDATE] alpha=1 beta=1
+  [PRUNE MIN] beta <= alpha | beta=1 alpha=1
+  [RETURN MIN] move=(4,5) score=1
+[RESULT MAX] move=(3,4) result_score=1 current_best=1
+[BEST MAX] best_move=(3,6) best_score=1
+[ALPHA UPDATE] alpha=1 beta=inf
+[RETURN MAX] move=(3,6) score=1`;
+
+        generateTree();
+      }
+
+      canvas.width = 1200;
+      canvas.height = 700;
+    </script>
+  </body>
+</html>
