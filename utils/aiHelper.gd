@@ -34,6 +34,16 @@ static func getImmediateYugo(board, currentPlayer) -> Dictionary:
 		"score": 0,
 	}
 
+static func isSameCell(cell_a: Dictionary, cell_b: Dictionary) -> bool:
+	return cell_a["row"] == cell_b["row"] and cell_a["col"] == cell_b["col"]
+
+static func hasCell(cells: Array, row: int, col: int) -> bool:
+	for cell in cells:
+		if cell["row"] == row and cell["col"] == col:
+			return true
+
+	return false
+
 static func getPossibleCells(moves, board, AI_PLAYER, HUMAN_PLAYER):
 	var possible_cells = []
 	if (len(moves) < 8):
@@ -66,8 +76,10 @@ static func getPossibleCells(moves, board, AI_PLAYER, HUMAN_PLAYER):
 			var near_row = move['row'] + dir['dr']
 			var near_col = move['col'] + dir['dc']
 			
-			
 			if (!MainHelper.isInsideBoard(near_row, near_col)):
+				continue
+				
+			if (hasCell(possible_cells, near_row, near_col)):
 				continue
 			
 			if (board[near_row][near_col] == Constants.EMPTY):
