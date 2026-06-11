@@ -5,6 +5,7 @@ extends GridContainer
 @onready var invalidMigoSound = get_tree().current_scene.get_node("invalidMigoEffect")
 @onready var blackTurnComp = get_tree().current_scene.get_node("VSPlayerNode/VSPlayerCanvasLayer/BlackTurn")
 @onready var whiteTurnComp = get_tree().current_scene.get_node("VSPlayerNode/VSPlayerCanvasLayer/WhiteTurn")
+@onready var drawPanel = get_tree().current_scene.get_node("VSPlayerNode/VSPlayerCanvasLayer/Draw")
 @onready var blackWin = get_tree().current_scene.get_node("VSPlayerNode/VSPlayerCanvasLayer/BWin")
 @onready var whiteWin = get_tree().current_scene.get_node("VSPlayerNode/VSPlayerCanvasLayer/WWin")
 @onready var playAgainBtn = get_tree().current_scene.get_node("VSPlayerNode/VSPlayerCanvasLayer/PlayAgainBtn")
@@ -58,7 +59,9 @@ func _on_cell_pressed(row, col):
 		invalidMigoSound.play()
 
 func showWinMenu(winner):
-	if (winner == "W"):
+	if (winner == "DRAW"):
+		drawPanel.visible = true
+	elif (winner == "W"):
 		whiteWin.visible = true
 	else:
 		blackWin.visible = true

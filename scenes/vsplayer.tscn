@@ -5,6 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://dipa7bklb4rit" path="res://assets/imgs/title.png" id="3_li34p"]
 [ext_resource type="Texture2D" uid="uid://dy63a2hf8qeb1" path="res://assets/imgs/black_win.png" id="4_nave4"]
 [ext_resource type="Script" uid="uid://v66y5o5qxycm" path="res://scripts/vsplayer_main.gd" id="4_yqjql"]
+[ext_resource type="Texture2D" uid="uid://b4wmx2u56qga3" path="res://assets/imgs/draw.png" id="5_ij8mu"]
 [ext_resource type="Texture2D" uid="uid://d7tmsrpnwdk" path="res://assets/imgs/backBtn.png" id="5_j2tqc"]
 [ext_resource type="Texture2D" uid="uid://ct2akg4aes2k0" path="res://assets/imgs/white_win.png" id="5_p6w2a"]
 [ext_resource type="Texture2D" uid="uid://df2tx3lao1aku" path="res://assets/imgs/play_again.png" id="6_p6w2a"]
@@ -54,6 +55,15 @@ offset_right = 1160.9999
 offset_bottom = 670.0
 scale = Vector2(0.9, 0.9)
 texture = ExtResource("4_nave4")
+
+[node name="Draw" type="TextureRect" parent="VSPlayerNode/VSPlayerCanvasLayer" unique_id=2047841792]
+visible = false
+offset_left = 153.72002
+offset_top = 455.40002
+offset_right = 1270.72
+offset_bottom = 705.4001
+scale = Vector2(0.7, 0.7)
+texture = ExtResource("5_ij8mu")
 
 [node name="WWin" type="TextureRect" parent="VSPlayerNode/VSPlayerCanvasLayer" unique_id=129599735]
 visible = false

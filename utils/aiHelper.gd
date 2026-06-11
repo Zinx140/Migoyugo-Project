@@ -47,25 +47,25 @@ static func hasCell(cells: Array, row: int, col: int) -> bool:
 static func getPossibleCells(moves, board, AI_PLAYER, HUMAN_PLAYER):
 	var possible_cells = []
 	if (len(moves) < 8):
-		if (board[2][2] == Constants.EMPTY):
+		if (board[2][2] == Constants.EMPTY && !hasCell(possible_cells, 5, 2)):
 			possible_cells.append({
 				'row': 2,
 				'col': 2,
 			})
 			
-		if (board[5][5] == Constants.EMPTY):
+		if (board[5][5] == Constants.EMPTY && !hasCell(possible_cells, 5, 2)):
 			possible_cells.append({
 				'row': 5,
 				'col': 5,
 			})
 		
-		if (board[2][5] == Constants.EMPTY):
+		if (board[2][5] == Constants.EMPTY && !hasCell(possible_cells, 2, 5)):
 			possible_cells.append({
 				'row': 2,
 				'col': 5,
 			})
 		
-		if (board[5][2] == Constants.EMPTY):
+		if (board[5][2] == Constants.EMPTY && !hasCell(possible_cells, 5, 2)):
 			possible_cells.append({
 				'row': 5,
 				'col': 2,
@@ -91,7 +91,7 @@ static func getPossibleCells(moves, board, AI_PLAYER, HUMAN_PLAYER):
 						'row': near_row,
 						'col': near_col,
 					})
-				
+					
 	return possible_cells
 		
 static func getTopMoves(moves, board, AI_PLAYER, HUMAN_PLAYER, currentPlayer):

@@ -334,7 +334,7 @@ static func getWegoResult(sourceBoard) -> Dictionary:
 		}
 
 	return {
-		"winner": "",
+		"winner": "DRAW",
 		"scores": scores
 	}
 

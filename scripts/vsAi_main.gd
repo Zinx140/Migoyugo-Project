@@ -5,6 +5,7 @@ extends GridContainer
 @onready var invalidMigoSound = get_tree().current_scene.get_node("invalidMigoEffect")
 @onready var blackTurnComp = get_tree().current_scene.get_node("VSAiNode/VSAiCanvasLayer/BlackTurn")
 @onready var whiteTurnComp = get_tree().current_scene.get_node("VSAiNode/VSAiCanvasLayer/WhiteTurn")
+@onready var drawPanel = get_tree().current_scene.get_node("VSAiNode/VSAiCanvasLayer/Draw")
 @onready var blackWin = get_tree().current_scene.get_node("VSAiNode/VSAiCanvasLayer/BWin")
 @onready var whiteWin = get_tree().current_scene.get_node("VSAiNode/VSAiCanvasLayer/WWin")
 @onready var playAgainBtn = get_tree().current_scene.get_node("VSAiNode/VSAiCanvasLayer/PlayAgainBtn")
@@ -37,6 +38,7 @@ func start_game(human_side) -> void:
 
 	whiteWin.visible = false
 	blackWin.visible = false
+	drawPanel.visible = false
 	playAgainBtn.visible = false
 	exitBtn.visible = false
 	backBtn.visible = true
@@ -176,7 +178,9 @@ func getMigoCell():
 	return ai_moves	
 
 func showWinMenu(winner):
-	if (winner == "W"):
+	if (winner == "DRAW"):
+		drawPanel.visible = true
+	elif (winner == "W"):
 		whiteWin.visible = true
 	else:
 		blackWin.visible = true

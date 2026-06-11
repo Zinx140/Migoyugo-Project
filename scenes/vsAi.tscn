@@ -12,6 +12,7 @@
 [ext_resource type="Texture2D" uid="uid://df2tx3lao1aku" path="res://assets/imgs/play_again.png" id="6_s7b25"]
 [ext_resource type="Script" uid="uid://gu7mmb102me1" path="res://scripts/vsAi_main.gd" id="7_0cqtl"]
 [ext_resource type="Texture2D" uid="uid://5xkude6jvj1s" path="res://assets/imgs/exit.png" id="7_2hky4"]
+[ext_resource type="Texture2D" uid="uid://b4wmx2u56qga3" path="res://assets/imgs/draw.png" id="9_0gw23"]
 [ext_resource type="Texture2D" uid="uid://d7tmsrpnwdk" path="res://assets/imgs/backBtn.png" id="9_3tp1k"]
 [ext_resource type="Texture2D" uid="uid://dmljinxfl11xq" path="res://assets/imgs/black_turn.png" id="10_bfdhq"]
 [ext_resource type="Texture2D" uid="uid://cfp0ewse7fobw" path="res://assets/imgs/white_turn.png" id="11_mxhni"]
@@ -135,6 +136,15 @@ offset_bottom = 667.0
 scale = Vector2(0.9, 0.9)
 texture = ExtResource("4_57axd")
 
+[node name="Draw" type="TextureRect" parent="VSAiNode/VSAiCanvasLayer" unique_id=1485045392]
+visible = false
+offset_left = 150.8
+offset_top = 456.0
+offset_right = 1267.8
+offset_bottom = 706.0
+scale = Vector2(0.7, 0.7)
+texture = ExtResource("9_0gw23")
+
 [node name="WWin" type="TextureRect" parent="VSAiNode/VSAiCanvasLayer" unique_id=288371505]
 visible = false
 offset_left = 36.0
@@ -184,6 +194,7 @@ scale = Vector2(0.4, 0.4)
 texture_normal = ExtResource("9_3tp1k")
 
 [node name="BlackTurn" type="TextureRect" parent="VSAiNode/VSAiCanvasLayer" unique_id=1990430433]
+visible = false
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
